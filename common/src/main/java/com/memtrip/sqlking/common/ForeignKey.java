@@ -17,10 +17,17 @@ package com.memtrip.sqlking.common;
 
 /**
  * @author Samuel Kirton [sam@memtrip.com]
+ * @author Adrian Velcich {adrian@higration.co.za}
  */
+
 @SuppressWarnings("WeakerAccess")
-public @interface ForeignKey {
-    String targetTable() default "";
-    String targetColumn() default "";
-    String localColumn() default "";
+public @interface ForeignKey
+    {
+    String foreignTableName () default "";
+    String foreignTableAlias () default "";
+    String[] foreignColumnNames () default {};
+    String[] localColumnNames () default {};
+    RIRule updateRule () default RIRule.Cascade;
+    RIRule deleteRule () default RIRule.Restrict;
+    String userText() default "";
 }

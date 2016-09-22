@@ -47,7 +47,7 @@ public class IndexTest extends IntegrationTest {
     @Test
     public void testPostIndexesAreCreated() {
         Cursor cursor = Raw.getBuilder()
-                .query("PRAGMA INDEX_LIST('Post');")
+                .query("PRAGMA index_list('Post');")
                 .execute(getSQLProvider());
 
         List<String> indexes = getIndexes(cursor);

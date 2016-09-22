@@ -19,5 +19,8 @@ package com.memtrip.sqlking.common;
  * @author Samuel Kirton [sam@memtrip.com]
  */
 public @interface Table {
+    Index[] indexes() default {};
     ForeignKey[] foreignKeys() default {};
+    Constraint[] constraints() default {};
+    Trigger[] triggers() default {};
 }

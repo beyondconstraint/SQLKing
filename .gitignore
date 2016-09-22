@@ -12,3 +12,5 @@ preprocessor/target
 common/target
 build
 *.keystore
+*.~*
+projectBackupFiles

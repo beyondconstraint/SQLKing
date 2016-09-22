@@ -15,30 +15,11 @@
  */
 package com.memtrip.sqlking.common;
 
-import android.content.ContentValues;
-import android.database.Cursor;
-
 /**
- * @author Samuel Kirton [sam@memtrip.com]
- * @author Adrian Velcich [adrian@higration.co.za]
+ * @author Adrian Velcich [adrian@higration.co.za] - 2016-09-16 - Added Composite and Unique Index support
  */
 
-@SuppressWarnings("WeakerAccess")
-public interface SQLQuery {
-    String getTableName();
-    String getTableCreateQuery ();
-
-    String[] getColumnNames();
-
-    String getCreateIndexesQuery();
-    String[] getIndexNames();
-
-    String getCreateTriggersQuery();
-    String[] getTriggerNames();
-
-    String[] buildUnionInsertQuery(Object[] models);
-
-    ContentValues getContentValues(Object model);
-
-    <T> T[] retrieveSQLSelectResults(Cursor cursor);
+public @interface IndexColumn {
+    String column();
+    SortOrder sortOrder() default SortOrder.ASC;
 }

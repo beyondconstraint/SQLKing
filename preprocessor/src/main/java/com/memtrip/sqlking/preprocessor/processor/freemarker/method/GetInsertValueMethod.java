@@ -26,11 +26,16 @@ public class GetInsertValueMethod implements TemplateMethodModelEx {
 
     }
 
-    private String assembleInsertValue(Column column, String getter) {
-        if (column.hasPrimaryKey() && column.hasAutoIncrement()) {
+    private String assembleInsertValue(Column column, String getter)
+        {
+        if (column.hasPrimaryKey() && column.hasAutoIncrement())
+            {
             return "NULL";
-        } else {
-            switch (column.getType()) {
+            }
+        else
+            {
+            switch (column.getType())
+                {
                 case "java.lang.String":
                 case "long":
                 case "int":
@@ -42,9 +47,9 @@ public class GetInsertValueMethod implements TemplateMethodModelEx {
                     return "\" + assembleBlob(" + getter + ") + \"";
                 default:
                     return "";
+                }
             }
         }
-    }
 
     @Override
     public Object exec(List arguments) throws TemplateModelException {

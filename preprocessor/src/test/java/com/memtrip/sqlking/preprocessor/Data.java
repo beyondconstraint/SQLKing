@@ -2,6 +2,9 @@ package com.memtrip.sqlking.preprocessor;
 
 import com.memtrip.sqlking.common.Column;
 import com.memtrip.sqlking.common.Table;
+import com.memtrip.sqlking.common.Index;
+import com.memtrip.sqlking.common.IndexColumn;
+import com.memtrip.sqlking.common.ForeignKey;
 
 @Table
 public class Data {
@@ -11,7 +14,6 @@ public class Data {
     public int getId() {
         return id;
     }
-
     public void setId(int id) {
         this.id = id;
     }
@@ -19,7 +21,6 @@ public class Data {
     public String getName() {
         return name;
     }
-
     public void setName(String name) {
         this.name = name;
     }

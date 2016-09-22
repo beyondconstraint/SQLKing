@@ -2,15 +2,23 @@ package com.memtrip.sqlking.integration.models;
 
 import com.memtrip.sqlking.common.Column;
 import com.memtrip.sqlking.common.ForeignKey;
+import com.memtrip.sqlking.common.Index;
+import com.memtrip.sqlking.common.IndexColumn;
 import com.memtrip.sqlking.common.Table;
 
 @Table(
         foreignKeys = {
-                @ForeignKey(
-                        targetTable = "Log",
-                        targetColumn = "id",
-                        localColumn = "logId"
-                )
+              @ForeignKey(
+                      foreignTableName = "Log",
+                      localColumnNames = {"logId"},
+                      foreignColumnNames = {"id"}
+              )
+        },
+        indexes = {
+              @Index(indexName = "username",
+                      indexColumns = {
+                         @IndexColumn(column = "username")}
+              )
         }
 )
 public class User  {

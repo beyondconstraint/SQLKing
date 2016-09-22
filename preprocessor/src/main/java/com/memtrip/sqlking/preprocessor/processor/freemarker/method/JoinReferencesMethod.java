@@ -20,9 +20,7 @@ public class JoinReferencesMethod implements TemplateMethodModelEx {
         return map;
     }
 
-    private JoinReferencesMethod() {
-
-    }
+    private JoinReferencesMethod() {}
 
     private String build(String joinTableName, List<Table> tables) {
         StringBuilder sb = new StringBuilder();
@@ -33,6 +31,7 @@ public class JoinReferencesMethod implements TemplateMethodModelEx {
             List<Column> columns = joinTable.getColumns();
             for (Column column : columns) {
                 if (column.isJoinable(tables)) {
+                        System.out.println(joinTableName + ": ++ " + column.getName());
                     Table columnTable = column.getRootTable(tables);
                     sb.append(buildJoinTable(joinTableName, columnTable));
                     sb.append(build(column.getClassName(), tables));

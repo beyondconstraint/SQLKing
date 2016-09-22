@@ -17,9 +17,15 @@ package com.memtrip.sqlking.common;
 
 /**
  * @author Samuel Kirton [sam@memtrip.com]
+ * @author Adrian Velcich [adrian@higration.co.za]
  */
+
 public @interface Column {
+    boolean index() default false;
     boolean primary_key() default false;
     boolean auto_increment() default false;
-    boolean index() default false;
+    boolean not_null() default false;
+    String  defaultValue() default "";
+    ForeignKey foreignKey() default @ForeignKey ();
+    Constraint[] constraints() default {};
 }

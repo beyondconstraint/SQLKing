@@ -101,7 +101,7 @@ public class CreateTest  extends IntegrationTest {
         };
 
         // exercise
-        Insert.getBuilder().values(users).execute(getSQLProvider());
+        Insert.getBuilder().values((Object[])users).execute(getSQLProvider());
 
         // verify
         User angieUser = Select.getBuilder()
@@ -148,7 +148,7 @@ public class CreateTest  extends IntegrationTest {
             );
         }
 
-        Insert.getBuilder().values(users).execute(getSQLProvider());
+        Insert.getBuilder().values((Object[])users).execute(getSQLProvider());
 
         User[] usersInserted = Select.getBuilder().execute(User.class, getSQLProvider());
 

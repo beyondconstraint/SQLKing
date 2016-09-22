@@ -26,7 +26,7 @@ public class SetupData {
         };
 
         Insert.getBuilder()
-                .values(data)
+                .values((Object[])data)
                 .execute(sqlProvider);
     }
 

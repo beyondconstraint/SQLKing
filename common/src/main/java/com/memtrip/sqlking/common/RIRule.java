@@ -15,30 +15,29 @@
  */
 package com.memtrip.sqlking.common;
 
-import android.content.ContentValues;
-import android.database.Cursor;
-
 /**
- * @author Samuel Kirton [sam@memtrip.com]
  * @author Adrian Velcich [adrian@higration.co.za]
  */
 
-@SuppressWarnings("WeakerAccess")
-public interface SQLQuery {
-    String getTableName();
-    String getTableCreateQuery ();
+public enum RIRule
+    {
+    SetNull     ("SET NULL"),
+    SetDefault  ("SET DEFAULT"),
+    Cascade     ("CASCADE"),
+    Restrict    ("RESTRICT"),
+    NotNull     ("NOT NULL"),
+    NoAction    ("NO ACTION");
 
-    String[] getColumnNames();
+    private final String name;
+    public final static RIRule values[] = values();
 
-    String getCreateIndexesQuery();
-    String[] getIndexNames();
+    RIRule (String name)
+        {
+        this.name = name;
+        }
 
-    String getCreateTriggersQuery();
-    String[] getTriggerNames();
-
-    String[] buildUnionInsertQuery(Object[] models);
-
-    ContentValues getContentValues(Object model);
-
-    <T> T[] retrieveSQLSelectResults(Cursor cursor);
-}
+    public String getName()
+        {
+        return this.name;
+        }
+    };

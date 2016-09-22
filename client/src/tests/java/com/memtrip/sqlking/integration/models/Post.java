@@ -7,9 +7,9 @@ import com.memtrip.sqlking.common.Table;
 @Table(
         foreignKeys = {
                 @ForeignKey(
-                        targetTable = "User",
-                        targetColumn = "id",
-                        localColumn = "userId"
+                        foreignTableName = "User",
+                        localColumnNames = {"id"},
+                        foreignColumnNames = {"userId"}
                 )
         }
 )

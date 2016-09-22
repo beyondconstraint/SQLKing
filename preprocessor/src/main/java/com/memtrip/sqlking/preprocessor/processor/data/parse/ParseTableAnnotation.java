@@ -1,26 +1,40 @@
 package com.memtrip.sqlking.preprocessor.processor.data.parse;
 
+import com.memtrip.sqlking.common.ConflictAction;
+
+import com.memtrip.sqlking.common.TriggerType;
+import com.memtrip.sqlking.common.TriggerTime;
+
 import com.memtrip.sqlking.preprocessor.processor.Context;
 import com.memtrip.sqlking.preprocessor.processor.data.Column;
 import com.memtrip.sqlking.preprocessor.processor.data.ForeignKey;
+import com.memtrip.sqlking.preprocessor.processor.data.Index;
+import com.memtrip.sqlking.preprocessor.processor.data.IndexColumn;
 import com.memtrip.sqlking.preprocessor.processor.data.Table;
+import com.memtrip.sqlking.preprocessor.processor.data.Constraint;
+import com.memtrip.sqlking.preprocessor.processor.data.Trigger;
 
 import javax.lang.model.element.Element;
 import javax.lang.model.element.Name;
 import javax.lang.model.element.PackageElement;
 import java.util.ArrayList;
 import java.util.List;
+import freemarker.ext.beans.StringModel;
 
 import static com.memtrip.sqlking.preprocessor.processor.data.parse.ParseColumnAnnotation.parseColumn;
 
-class ParseTableAnnotation {
-
-    static Table parseTable(Element element) {
-
-        String name = assembleName(element);
-        String tablePackage = assemblePackage(element);
-        String type = tablePackage + "." + name;
-        List<Column> columns = assembleColumns(element);
+class ParseTableAnnotation
+    {
+    static Table parseTable(Element element)
+        {
+        String name                     = assembleName(element);
+        String tablePackage             = assemblePackage(element);
+        String type                     = tablePackage + "." + name;
+        List<Column> columns            = assembleColumns(element);
+        List<ForeignKey> foreignKeys    = assembleForeignKeys(element);
+        List<Index> indexes             = assembleIndexes(element);
+        List<Constraint> constraints    = assembleConstraints(element);
+        List<Trigger> triggers          = assembleTriggers(element);
 
         Table table = new Table();
         table.setElement(element);
@@ -28,7 +42,10 @@ class ParseTableAnnotation {
         table.setPackage(tablePackage);
         table.setType(type);
         table.setColumns(columns);
-        table.setForeignKeys(assembleForeignKeys(element));
+        table.setForeignKeys(foreignKeys);
+        table.setIndexes(indexes);
+        table.setConstraints (constraints);
+        table.setTriggers (triggers);
 
         return table;
     }
@@ -54,25 +71,134 @@ class ParseTableAnnotation {
                 }
             }
         }
-
         return columns;
     }
 
-    private static List<ForeignKey> assembleForeignKeys(Element element) {
+    private static List<Index> assembleIndexes (Element element)
+        {
+        com.memtrip.sqlking.common.Table tableAnnotation = element.getAnnotation(com.memtrip.sqlking.common.Table.class);
+        com.memtrip.sqlking.common.Index[] indexesAnnotation = tableAnnotation.indexes();
+
+        String tableName = element.getSimpleName().toString();
+
+        List<Index> indexes = new ArrayList<>();
+
+        for (com.memtrip.sqlking.common.Index indexAnnotation : indexesAnnotation)
+            {
+            Index index = new Index();
+
+            index.setTableName(tableName);
+            index.setIndexName(indexAnnotation.indexName());
+            index.setUnique(indexAnnotation.unique());
+
+            com.memtrip.sqlking.common.IndexColumn[] indexColumnsAnnotation = indexAnnotation.columns();
+
+            List<IndexColumn> idxColumns = new ArrayList<>();
+
+            for (com.memtrip.sqlking.common.IndexColumn columnAnnotation : indexColumnsAnnotation)
+                {
+                IndexColumn indexColumn = new IndexColumn();
+
+                indexColumn.setColumn(columnAnnotation.column());
+                indexColumn.setSortOrder(columnAnnotation.sortOrder());
+
+                idxColumns.add(indexColumn);
+                }
+
+            index.setColumns(idxColumns);
+
+            indexes.add(index);
+            }
+        return indexes;
+        }
+
+    private static List<ForeignKey> assembleForeignKeys(Element element)
+        {
         com.memtrip.sqlking.common.Table tableAnnotation = element.getAnnotation(com.memtrip.sqlking.common.Table.class);
         com.memtrip.sqlking.common.ForeignKey[] foreignKeysAnnotation = tableAnnotation.foreignKeys();
 
         List<ForeignKey> foreignKeys = new ArrayList<>();
 
-        for (com.memtrip.sqlking.common.ForeignKey annotation : foreignKeysAnnotation) {
+        for (com.memtrip.sqlking.common.ForeignKey fkAnnotation : foreignKeysAnnotation)
+            {
             ForeignKey foreignKey = new ForeignKey();
-            foreignKey.setTable(annotation.targetTable());
-            foreignKey.setTargetColumn(annotation.targetColumn());
-            foreignKey.setLocalColumn(annotation.localColumn());
 
+            foreignKey.setForeignTableName(fkAnnotation.foreignTableName());
+            foreignKey.setForeignTableAliasName (fkAnnotation.foreignTableAlias());
+
+            List<String> foreignColumnNames = new ArrayList<>();
+            for (String columnName : fkAnnotation.foreignColumnNames())
+                {
+                foreignColumnNames.add(columnName);
+                }
+            foreignKey.setForeignColumnNames(foreignColumnNames);
+
+            List<String> localColumnNames = new ArrayList<>();
+            for (String columnName : fkAnnotation.localColumnNames())
+                {
+                localColumnNames.add(columnName);
+                }
+
+            foreignKey.setLocalColumnNames(localColumnNames);
             foreignKeys.add(foreignKey);
-        }
+            }
 
         return foreignKeys;
+        }
+
+    private static List<Constraint> assembleConstraints(Element element)
+        {
+        com.memtrip.sqlking.common.Table tableAnnotation = element.getAnnotation(com.memtrip.sqlking.common.Table.class);
+        com.memtrip.sqlking.common.Constraint[] constraintsAnnotation = tableAnnotation.constraints();
+
+        List<Constraint> constraints = new ArrayList<>();
+
+        for (com.memtrip.sqlking.common.Constraint constraintAnnotation : constraintsAnnotation)
+            {
+            Constraint constraint = new Constraint();
+
+            constraint.setConstraintName(constraintAnnotation.constraintName());
+            constraint.setConstraintExpression(constraintAnnotation.expression());
+            constraint.setOnConflict(constraintAnnotation.onConflict());
+
+            constraints.add(constraint);
+            }
+
+        return constraints;
+        }
+
+    private static List<Trigger> assembleTriggers(Element element)
+        {
+        com.memtrip.sqlking.common.Table tableAnnotation = element.getAnnotation(com.memtrip.sqlking.common.Table.class);
+        com.memtrip.sqlking.common.Trigger[] triggersAnnotation = tableAnnotation.triggers();
+
+        List<Trigger> triggers = new ArrayList<>();
+
+        for (com.memtrip.sqlking.common.Trigger triggerAnnotation : triggersAnnotation)
+            {
+            Trigger trigger = new Trigger();
+
+            trigger.setTriggerName(triggerAnnotation.triggerName());
+            trigger.setTriggerTime(triggerAnnotation.triggerTime());
+            trigger.setTriggerType(triggerAnnotation.triggerType());
+
+            List<String> onUpdateColumns = new ArrayList<>();
+
+            for (String columnName : triggerAnnotation.updateOfColumnNames())
+                {
+                onUpdateColumns.add(columnName);
+                }
+
+            trigger.setOnUpdateOfColumnNames(onUpdateColumns);
+
+            trigger.setForEachRow(triggerAnnotation.forEachRow());
+            trigger.setWhenExpression(triggerAnnotation.whenExpression());
+            trigger.setStatement(triggerAnnotation.statement());
+
+            triggers.add(trigger);
+            }
+
+        return triggers;
+        }
+
     }
-}

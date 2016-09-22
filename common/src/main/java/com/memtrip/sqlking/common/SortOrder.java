@@ -15,30 +15,17 @@
  */
 package com.memtrip.sqlking.common;
 
-import android.content.ContentValues;
-import android.database.Cursor;
-
 /**
- * @author Samuel Kirton [sam@memtrip.com]
- * @author Adrian Velcich [adrian@higration.co.za]
+ * Author: A.Velcich
  */
 
-@SuppressWarnings("WeakerAccess")
-public interface SQLQuery {
-    String getTableName();
-    String getTableCreateQuery ();
+public enum SortOrder
+    {
+    ASC    ("ASC"),
+    DESC   ("DESC");
 
-    String[] getColumnNames();
+    private final String text;
 
-    String getCreateIndexesQuery();
-    String[] getIndexNames();
-
-    String getCreateTriggersQuery();
-    String[] getTriggerNames();
-
-    String[] buildUnionInsertQuery(Object[] models);
-
-    ContentValues getContentValues(Object model);
-
-    <T> T[] retrieveSQLSelectResults(Cursor cursor);
-}
+    SortOrder (String newVal) { text = newVal; }
+    public final static SortOrder values[] = values();
+    }

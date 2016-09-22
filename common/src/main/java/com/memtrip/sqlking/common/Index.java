@@ -15,30 +15,14 @@
  */
 package com.memtrip.sqlking.common;
 
-import android.content.ContentValues;
-import android.database.Cursor;
-
 /**
- * @author Samuel Kirton [sam@memtrip.com]
  * @author Adrian Velcich [adrian@higration.co.za]
  */
 
-@SuppressWarnings("WeakerAccess")
-public interface SQLQuery {
-    String getTableName();
-    String getTableCreateQuery ();
+import com.memtrip.sqlking.common.IndexColumn;
 
-    String[] getColumnNames();
-
-    String getCreateIndexesQuery();
-    String[] getIndexNames();
-
-    String getCreateTriggersQuery();
-    String[] getTriggerNames();
-
-    String[] buildUnionInsertQuery(Object[] models);
-
-    ContentValues getContentValues(Object model);
-
-    <T> T[] retrieveSQLSelectResults(Cursor cursor);
+public @interface Index {
+    String indexName() default "";
+    IndexColumn[] columns() default {};
+    boolean unique() default false;
 }
