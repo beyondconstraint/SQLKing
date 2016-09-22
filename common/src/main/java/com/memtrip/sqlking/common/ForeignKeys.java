@@ -16,11 +16,9 @@
 package com.memtrip.sqlking.common;
 
 /**
- * @author Samuel Kirton [sam@memtrip.com]
+ * @author Adrian Velcich [adrian@higration.co.za] - 2016-09-16 - Added Composite Foreign Key support
  */
-public @interface Column {
-    boolean index() default false;
-    boolean primary_key() default false;
-    boolean auto_increment() default false;
-    boolean not_null() default false;
+
+public @interface ForeignKeys {
+    ForeignKey[] foreignKeys();
 }

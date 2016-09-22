@@ -66,6 +66,9 @@ public class Q {
                         "${table.getName()}_${column.getName()}_index",
                     </#if>
                 </#list>
+                <#list table.getIndexes() as index>
+                        "${table.getName()}_${index.getIndexName()}_index",
+                </#list>
                 };
             }
 
@@ -78,7 +81,15 @@ public class Q {
                         sb.append("CREATE INDEX ${table.getName()}_${column.getName()}_index ON ${table.getName()} (${column.getName()});");
                     </#if>
                 </#list>
-
+                <#list table.getIndexes() as index>
+                    sb.append("CREATE INDEX ${table.getName()}_${index.getIndexName()}_idx ON ${table.getName()} (");
+                    <#list index.getColumns() as indexColumn>
+                        sb.append("${indexColumn.getColumn()} ${indexColumn.getSortOrder()}");
+                        sb.append(", ");
+                    </#list>
+                    sb.deleteCharAt(sb.length() - 1);
+                    sb.append(");");
+                </#list>
                 return (sb.length() > 0) ? sb.toString() : null;
             }
 

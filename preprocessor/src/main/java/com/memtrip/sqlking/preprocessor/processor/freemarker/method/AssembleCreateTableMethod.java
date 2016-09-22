@@ -2,6 +2,8 @@ package com.memtrip.sqlking.preprocessor.processor.freemarker.method;
 
 import com.memtrip.sqlking.preprocessor.processor.data.Column;
 import com.memtrip.sqlking.preprocessor.processor.data.ForeignKey;
+import com.memtrip.sqlking.preprocessor.processor.data.IndexColumn;
+import com.memtrip.sqlking.preprocessor.processor.data.Index;
 import com.memtrip.sqlking.preprocessor.processor.data.Table;
 import freemarker.ext.beans.StringModel;
 import freemarker.template.TemplateMethodModelEx;
@@ -36,46 +38,62 @@ public class AssembleCreateTableMethod implements TemplateMethodModelEx {
      * @param	table	The table that the statement will create
      * @return	A SQL statement that will create a table
      */
-    private String buildCreateTableStatement(Table table, List<Table> tables) {
-        StringBuilder statementBuilder = new StringBuilder();
+    private String buildCreateTableStatement(Table table, List<Table> tables)
+        {
+        StringBuilder sb = new StringBuilder();
 
-        statementBuilder.append("CREATE TABLE ");
-        statementBuilder.append(table.getName());
-        statementBuilder.append(" (");
+        sb.append("CREATE TABLE ");
+        sb.append(table.getName());
+        sb.append(" (");
 
-        for (int i = 0; i < table.getColumns().size(); i++) {
+        for (int i = 0; i < table.getColumns().size(); i++)
+            {
             Column column = table.getColumns().get(i);
 
-            if (!column.isJoinable(tables)) {
-                statementBuilder.append(column.getName());
-                statementBuilder.append(" ");
-                statementBuilder.append(getSQLDataTypeFromClassRef(column.getType()));
+            if (!column.isJoinable(tables))
+                {
+                sb.append(column.getName())
+                    .append(" ")
+                    .append(getSQLDataTypeFromClassRef(column.getType()));
 
-                if (column.hasPrimaryKey()) {
-                    statementBuilder.append(" PRIMARY KEY");
-                    if (column.hasAutoIncrement()) {
-                        statementBuilder.append(" AUTOINCREMENT");
+                if (column.hasPrimaryKey())
+                    {
+                    sb.append(" PRIMARY KEY");
+                    if (column.hasAutoIncrement())
+                        {
+                        sb.append(" AUTOINCREMENT");
                     }
                 }
 
-                statementBuilder.append(",");
+                sb.append(",");
             }
         }
 
-        for (ForeignKey foreignKey : table.getForeignKeys()) {
-            statementBuilder.append("FOREIGN KEY(")
-                    .append(foreignKey.getThisColumn()).append(") REFERENCES ")
-                    .append(foreignKey.getTable())
+        List<ForeignKey> foreignKeyList = table.getForeignKeys();
+        for (ForeignKey foreignKey : foreignKeyList)
+            {
+            StringBuilder sb_FK = new StringBuilder();
+            sb_FK.append(table.getName() + " - Foreign Key:  ")
+                       .append( foreignKey.getForeignTableName())
+                       .append(" ")
+                       .append( foreignKey.getLocalColumnNames().toString().replaceAll("[\\[\\]]", ""))
+                       .append( " References ")
+                       .append( foreignKey.getForeignColumnNames().toString().replaceAll("[\\[\\]]", ""));
+            System.out.println("\"" + sb_FK.toString() + "\"");
+            sb.append(" FOREIGN KEY(")
+                    .append(foreignKey.getLocalColumnNames().toString().replaceAll("[\\[\\]]", ""))
+                    .append(") REFERENCES ")
+                    .append(foreignKey.getForeignTableName())
                     .append("(")
-                    .append(foreignKey.getForeignColumn())
+                    .append(foreignKey.getForeignColumnNames().toString().replaceAll("[\\[\\]]", ""))
                     .append("),");
         }
 
-        statementBuilder.deleteCharAt(statementBuilder.length()-1);
+        sb.deleteCharAt(sb.length() - 1);
 
-        statementBuilder.append(");");
+        sb.append(");");
 
-        return "\"" + statementBuilder.toString() + "\";";
+        return "\"" + sb.toString() + "\"";
     }
 
     /**

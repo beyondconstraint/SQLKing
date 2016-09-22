@@ -19,8 +19,11 @@ package com.memtrip.sqlking.common;
  * @author Samuel Kirton [sam@memtrip.com]
  */
 @SuppressWarnings("WeakerAccess")
-public @interface ForeignKey {
-    String targetTable() default "";
-    String targetColumn() default "";
-    String localColumn() default "";
+public @interface ForeignKey
+    {
+    String foreignTableName ();
+    String[] foreignColumnNames ();
+    String[] localColumnNames ();
+    RIRule updateRule () default RIRule.Restrict;
+    RIRule deleteRule () default RIRule.Restrict;
 }

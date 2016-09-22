@@ -7,6 +7,7 @@ public class Column {
     private String mClassName;
     private String mType;
     private boolean mIsIndex;
+    private boolean mIsNotNull;
     private boolean mPrimaryKey;
     private boolean mHasAutoIncrement;
 
@@ -45,6 +46,14 @@ public class Column {
         mIsIndex = newVal;
     }
 
+    public boolean isNotNull ()
+        {
+        return mIsNotNull;
+        }
+    public void setNotNull (boolean newVal)
+        {
+        this.mIsNotNull = newVal;
+        }
     public boolean hasPrimaryKey() {
         return mPrimaryKey;
     }

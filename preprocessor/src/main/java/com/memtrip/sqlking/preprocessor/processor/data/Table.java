@@ -11,6 +11,7 @@ public class Table {
     private String mType;
     private List<Column> mColumns;
     private List<ForeignKey> mForeignKeys;
+    private List<Index> mIndexes;
 
     public Element getElement() {
         return mElement;
@@ -63,6 +64,12 @@ public class Table {
         mForeignKeys = newVal;
     }
 
+    public List<Index> getIndexes() {
+    return mIndexes;
+    }
+    public void setIndexes(List<Index> newVal) {
+    mIndexes = newVal;
+    }
     /**
      * (Used in Q.java freemarker template)
      * @return  all columns ignoring any object mappings

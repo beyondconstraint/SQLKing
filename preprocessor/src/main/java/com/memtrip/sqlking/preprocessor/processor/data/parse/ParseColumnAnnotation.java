@@ -14,6 +14,7 @@ class ParseColumnAnnotation {
         boolean isIndex = assembleIsIndex(element);
         boolean hasPrimaryKey = assemblePrimaryKey(element);
         boolean hasAutoIncrement = assembleAutoIncrement(element);
+        boolean isNotNotNull = assembleNotNull(element);
         String type = assembleType(element);
         String className = assembleClassName(type);
 
@@ -22,6 +23,7 @@ class ParseColumnAnnotation {
         column.setIsIndex(isIndex);
         column.setHasPrimaryKey(hasPrimaryKey);
         column.setHasAutoIncrement(hasAutoIncrement);
+        column.setNotNull(isNotNotNull);
         column.setType(type);
         column.setClassName(className);
 
@@ -56,5 +58,9 @@ class ParseColumnAnnotation {
     private static boolean assembleAutoIncrement(Element element) {
         com.memtrip.sqlking.common.Column column = element.getAnnotation(com.memtrip.sqlking.common.Column.class);
         return column.auto_increment();
+    }
+    private static boolean assembleNotNull(Element element) {
+        com.memtrip.sqlking.common.Column column = element.getAnnotation(com.memtrip.sqlking.common.Column.class);
+        return column.not_null();
     }
 }

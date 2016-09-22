@@ -8,8 +8,8 @@ annotations and CRUD classes expose an expressive api for executing SQLite queri
 preprocessors on Android.*
 ```groovy
 dependencies {
-    apt 'com.memtrip.sqlking:preprocessor:1.1.5'
-    compile 'com.memtrip.sqlking:client:1.1.5'
+    apt 'com.memtrip.sqlking:preprocessor:1.1.6'
+    compile 'com.memtrip.sqlking:client:1.1.6'
 }
 ```
 

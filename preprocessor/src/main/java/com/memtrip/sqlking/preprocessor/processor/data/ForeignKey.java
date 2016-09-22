@@ -1,31 +1,47 @@
 package com.memtrip.sqlking.preprocessor.processor.data;
 
-public class ForeignKey {
-    private String mTable;
-    private String mThisColumn;
-    private String mForeignColumn;
+import java.util.List;
+import com.memtrip.sqlking.common.RIRule;
+import com.memtrip.sqlking.preprocessor.processor.utils.StringUtils;
+public class ForeignKey
+    {
+    private String       mForeignTableName;
+    private List<String> mLocalColumnNames;
+    private List<String> mForeignColumnNames;
+    private RIRule       mRIUpdateRule;
+    private RIRule       mRIDeleteRule;
 
-    public String getTable() {
-        return mTable;
+    public String getForeignTableName() {
+        return mForeignTableName;
     }
 
-    public void setTable(String newVal) {
-        mTable = newVal;
+    public void setForeignTableName(String newVal) {
+    mForeignTableName = newVal;
     }
 
-    public String getThisColumn() {
-        return mThisColumn;
+    public List<String> getLocalColumnNames() { return mLocalColumnNames; }
+    public void setLocalColumnNames(List<String> newVal) { mLocalColumnNames = newVal; }
+    public List<String> getForeignColumnNames() { return mForeignColumnNames; }
+    public void setForeignColumnNames(List<String> newVals) {
+        mForeignColumnNames = newVals;
     }
 
-    public void setLocalColumn(String newVal) {
-        mThisColumn = newVal;
+    public RIRule getRIUpdateRule ()
+        {
+        return mRIUpdateRule;
+        }
+    public void setRIUpdateRule (RIRule newVal)
+        {
+        this.mRIUpdateRule = newVal;
     }
 
-    public String getForeignColumn() {
-        return mForeignColumn;
+    public RIRule getRIDeleteRule ()
+        {
+        return mRIDeleteRule;
     }
 
-    public void setTargetColumn(String newVal) {
-        mForeignColumn = newVal;
+    public void setRIDeleteRule (RIRule newVal)
+        {
+        this.mRIDeleteRule = newVal;
     }
 }

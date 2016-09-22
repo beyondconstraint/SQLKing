@@ -5,6 +5,9 @@ import com.google.googlejavaformat.java.Formatter;
 import com.google.googlejavaformat.java.FormatterException;
 import com.memtrip.sqlking.common.Column;
 import com.memtrip.sqlking.common.Table;
+import com.memtrip.sqlking.common.Index;
+import com.memtrip.sqlking.common.IndexColumn;
+import com.memtrip.sqlking.common.ForeignKey;
 import com.memtrip.sqlking.preprocessor.processor.data.Data;
 import com.memtrip.sqlking.preprocessor.processor.data.parse.ParseAnnotations;
 import com.memtrip.sqlking.preprocessor.processor.data.validator.MembersHaveGetterSettersValidator;
@@ -36,7 +39,7 @@ public class Processor extends AbstractProcessor {
 	}
 
 	@Override
-	public boolean process(Set<? extends TypeElement> annoations, RoundEnvironment env) {
+	public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment env) {
         Set<? extends Element> elements = env.getElementsAnnotatedWith(Table.class);
 
         if (elements != null && elements.size() > 0) {
@@ -82,6 +85,9 @@ public class Processor extends AbstractProcessor {
 		Set<String> set = new HashSet<>();
 		set.add(Table.class.getCanonicalName());
 		set.add(Column.class.getCanonicalName());
+        set.add(Index.class.getCanonicalName());
+        set.add(IndexColumn.class.getCanonicalName());
+        set.add(ForeignKey.class.getCanonicalName());
 		return set;
 	}
 

@@ -44,7 +44,6 @@ public class GetInsertValueMethod implements TemplateMethodModelEx {
                     return "";
             }
         }
-    }
 
     @Override
     public Object exec(List arguments) throws TemplateModelException {

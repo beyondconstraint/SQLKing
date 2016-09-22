@@ -16,11 +16,13 @@
 package com.memtrip.sqlking.common;
 
 /**
- * @author Samuel Kirton [sam@memtrip.com]
+ * @author Adrian Velcich [adrian@higration.co.za] - 2016-09-16 - Added Composite and Unique Index support
  */
-public @interface Column {
-    boolean index() default false;
-    boolean primary_key() default false;
-    boolean auto_increment() default false;
-    boolean not_null() default false;
+
+import com.memtrip.sqlking.common.IndexColumn;
+
+public @interface Index {
+    String indexName();
+    boolean unique() default false;
+    IndexColumn[] columns() default {};
 }

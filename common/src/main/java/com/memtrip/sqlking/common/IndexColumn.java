@@ -15,12 +15,14 @@
  */
 package com.memtrip.sqlking.common;
 
+import java.lang.annotation.Repeatable;
+
 /**
- * @author Samuel Kirton [sam@memtrip.com]
+ * @author Adrian Velcich [adrian@higration.co.za] - 2016-09-16 - Added Composite and Unique Index support
  */
-public @interface Column {
-    boolean index() default false;
-    boolean primary_key() default false;
-    boolean auto_increment() default false;
-    boolean not_null() default false;
+
+@SuppressWarnings("WeakerAccess")
+public @interface IndexColumn {
+    String column();
+    SortOrder sortOrder() default SortOrder.ASC;
 }
