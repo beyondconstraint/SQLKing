@@ -42,6 +42,7 @@ public class AssembleCreateIndexesMethod implements TemplateMethodModelEx {
             for (IndexColumn indexColumn : index.getColumns())
                 {
                 sb.append(indexColumn.getColumn())
+                        .append(" ")
                         .append(indexColumn.getSortOrder())
                         .append(",");
                 }
