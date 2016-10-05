@@ -12,7 +12,8 @@ public enum TriggerType
     {
     DELETE      ("DELETE"),
     INSERT      ("INSERT"),
-    UPDATE      ("UPDATE");
+    UPDATE      ("UPDATE"),
+    NONE        ("NONE");
 
     private final String text;
 
