@@ -20,24 +20,23 @@ public class PrimaryKeyMustBeUnique implements Validator {
     private boolean primaryKeyIsUniqueInColumns(Table table) {
         int occurrences = 0;
 
-//        PrimaryKey primaryKey = table.getPrimaryKey();
-//
-//        if (primaryKey != null && primaryKey.getColumns().length > 0)
-//            {
-//            occurrences++;
-//            }
+        PrimaryKey primaryKey = table.getPrimaryKey();
 
-//        if (table.getColumns() != null) {
-//            for (Column column : table.getColumns()) {
-//
-//                PrimaryKey primaryKey = column.getPrimaryKey();
-//
-//                if (primaryKey != null) {
-////                if (primaryKey.getColumns().length > 0) {
-//                    occurrences++;
-//                }
-//            }
-//        }
+        if (primaryKey != null && primaryKey.getColumns().length > 0)
+            {
+            occurrences++;
+            }
+
+        if (table.getColumns() != null) {
+            for (Column column : table.getColumns()) {
+
+                primaryKey = column.getPrimaryKey();
+
+                if (primaryKey != null && primaryKey.getColumns().length > 0 ) {
+                    occurrences++;
+                }
+            }
+        }
 
         return occurrences > 1;
     }
