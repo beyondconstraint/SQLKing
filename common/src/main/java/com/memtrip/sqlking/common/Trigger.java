@@ -21,8 +21,8 @@ package com.memtrip.sqlking.common;
 
 public @interface Trigger {
     String triggerName() default "";
-    TriggerTime triggerTime();
-    TriggerType triggerType();
+    TriggerTime triggerTime() default TriggerTime.NONE;
+    TriggerType triggerType() default TriggerType.NONE;
     String[] updateOfColumnNames() default {};
     boolean forEachRow() default false;
     String whenExpression() default "";

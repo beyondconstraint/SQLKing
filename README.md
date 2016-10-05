@@ -364,21 +364,22 @@ Multiple table Constraints, Composite Indexes and Composite Foreign Keys can be 
                                              |RIRule.NoAction>]
 
                         }
-                   )[, ...]                                     // optional additional @ForeignKey statements     
+                   )[, ...]                                         // optional additional @ForeignKey statements     
     },
     indexes = {@Index (
-                    indexName = "index_name",                   // will be created as "table_name_index_name_index". index_name must be unique within the indexes on the parent table
-                    columns = {@IndexColumn (column = "column1"
-                                             [,sortOrder = SortOrder.ASC|SortOrder.DESC]    // optional column sort order (default is SortOrder.ASC)
-                                )[, ...]                        // optional additional @IndexColumn statements
+                    indexName = "index_name",                       // will be created as "table_name_index_name_index". index_name must be unique within the indexes on the parent table
+                    columns = {@IndexColumn (
+                                    column = "column1"
+                                       [,sortOrder = SortOrder.ASC|SortOrder.DESC]    // optional column sort order (default is SortOrder.ASC)
+                               )[, ...]                             // optional additional @IndexColumn statements
                     }
-                )[, ...]                                        // optional additional @Index statements
+               )[, ...]                                             // optional additional @Index statements
      },
     constraints = {@Constraint (
                     constraintName = "constraintName",          // will be created as "table_name_constraint_name_constraint". the constraint name must be unique within the constraints for the table
                     expression = "some expression eg, PRIMARY|FOREIGN KEY, UNIQUE, CHECK" // see SQLite documentation fot `table_constraint` clause
                     [,@onConflict (ConflictAction.ROLLBACK|ABORT|FAIL|IGNORE|REPLACE)]    // as appropriate, if required           
-                    )[, ...]                                    // optional additional @Constraint statements
+                    )[, ...]                                        // optional additional @Constraint statements
      }                    
 )
 ```
@@ -389,13 +390,19 @@ Triggers can be defined at the Table Level with the following syntax:
 ```java
 @Table (
         triggers = {@Trigger(triggerName = "my_trigger_name",
-                            [,triggerTime = <TriggerTime.BEFORE | TriggerTime.AFTER | TriggerTime.INSTEAD_OF>]  // only one trigger time is allowed, but it is not required (default is TriggerTime.NONE)
-                            [,triggerType = <TriggerType.INSERT | TriggerType.UPDATE | TriggerType.DELETE>]     // only one trigger type is allowed, but is not required (default is triggerType.NONE) 
-                            [,updateOfColumns = { column[,...] }]                                             // one or more columns  
-                            [,forEachRow = true|false]                                                        // not required, defaults to false. SQLite does not currently support FOR_EACH_STATEMENT
-                            [,whenExpression = "my_when_expression"]                                          // see SQLite document for the 'my_when_expression' syntax   
-                            ,statement = "my_trigger_statement"                                                // see SQLite document for the 'my_trigger_expression' syntax  
-                    )[,...]                                                                                   // optional addition @Trigger statements  
+                            [,triggerTime = <TriggerTime.BEFORE         // optional; only one trigger time is allowed, but it is not required (default is TriggerTime.NONE)
+                                            | TriggerTime.AFTER 
+                                            | TriggerTime.INSTEAD_OF 
+                                            | TriggerTime.NONE>]          
+                            [,triggerType = <TriggerType.INSERT         // optional; only one trigger type is allowed, but is not required (default is triggerType.NONE)
+                                            | TriggerType.UPDATE 
+                                            | TriggerType.DELETE 
+                                            | TriggerType.NONE>]      
+                            [,updateOfColumns = { <column>[,...] }]     // one or more columns  
+                            [,forEachRow = <true|false>]                // optional; defaults to false. SQLite does not currently support FOR_EACH_STATEMENT
+                            [,whenExpression = <"my_when_expression">]  // optional; see SQLite document for the 'my_when_expression' syntax   
+                            <,statement = "my_trigger_statement">         // see SQLite document for the 'my_trigger_expression' syntax  
+                    )[,...]                                             // optional addition @Trigger statements  
         }
 )        
 

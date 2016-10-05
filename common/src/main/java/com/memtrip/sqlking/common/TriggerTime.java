@@ -12,7 +12,8 @@ public enum TriggerTime
     {
     BEFORE      ("BEFORE"),
     AFTER       ("AFTER"),
-    INSTEAD_OF  ("INSTEAD OF");
+    INSTEAD_OF  ("INSTEAD OF"),
+    NONE        ("NONE");
 
     private final String text;
 
