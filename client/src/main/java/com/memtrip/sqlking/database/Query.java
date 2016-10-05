@@ -29,6 +29,7 @@ public abstract class Query {
 
         return sqlProvider.query(
                 sqlQuery.getTableName(),
+                select.getTableAliasName(),
                 sqlQuery.getColumnNames(),
                 select.getClause(),
                 select.getJoin(),

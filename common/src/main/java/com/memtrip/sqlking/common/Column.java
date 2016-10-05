@@ -21,11 +21,15 @@ package com.memtrip.sqlking.common;
  */
 
 public @interface Column {
-    boolean index() default false;
-    boolean primary_key() default false;
-    boolean auto_increment() default false;
-    boolean not_null() default false;
-    String  defaultValue() default "";
-    ForeignKey foreignKey() default @ForeignKey ();
+    boolean isIndex() default false;
+
+    PrimaryKey primaryKey() default @PrimaryKey(); // sortOrder = SortOrder.ASC, onConflict = ConflictAction.ROLLBACK);
+
+    NotNull notNull() default @NotNull(onConflict = ConflictAction.NONE);
+    boolean isUnique() default false;
+    Check check() default @Check();
+    String defaultValue() default "";
+    ForeignKey foreignKey() default @ForeignKey(); // Only one column recognised if this is a column constraint
     Constraint[] constraints() default {};
+
 }

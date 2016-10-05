@@ -31,10 +31,13 @@ import rx.Observable;
  * @author Samuel Kirton [sam@memtrip.com]
  */
 public class Select extends Query {
-    private Clause[] mClause;
-    private Join[] mJoin;
-    private OrderBy mOrderBy;
-    private Limit mLimit;
+    private String      mTableAlias;
+    private Clause[]    mClause;
+    private Join[]      mJoin;
+    private OrderBy     mOrderBy;
+    private Limit       mLimit;
+
+    public String getTableAliasName() { return mTableAlias; }
 
     public Clause[] getClause() {
         return mClause;
@@ -59,29 +62,39 @@ public class Select extends Query {
         mLimit = limit;
     }
 
-    public static Builder getBuilder() {
-        return new Builder();
+    private Select(String tableAlias, Clause[] clause, Join[] join, OrderBy orderBy, Limit limit) {
+        mTableAlias = tableAlias;
+        mClause = clause;
+        mJoin = join;
+        mOrderBy = orderBy;
+        mLimit = limit;
     }
 
-    public static class Builder {
-        private Clause[] mClause;
-        private Join[] mJoin;
+
+    public static SelectBuilder getBuilder () {
+        return new SelectBuilder();
+    }
+
+    public static class SelectBuilder {
+        private Clause[]         mClause;
+        private Join[]           mJoin;
+
         private OrderBy mOrderBy;
         private Limit mLimit;
 
-        private Builder() { }
+        private SelectBuilder() { }
 
         /**
          * Specify a Where clause for the Select query
          * @param clause Where clause
          * @return Call Builder#execute, Builder#rx, or Builder#rxSingle to run the query
          */
-        public Builder where(Clause... clause) {
+        public SelectBuilder where(Clause... clause) {
             mClause = clause;
             return this;
         }
 
-        public Builder join(Join... joins) {
+        public SelectBuilder join(Join... joins) {
             mJoin = joins;
             return this;
         }
@@ -92,7 +105,7 @@ public class Select extends Query {
          * @param order The direction of the Order By clause
          * @return Call Builder#executem Builder#rx or Builder#rxSingle to run the query
          */
-        public Builder orderBy(String column, OrderBy.Order order) {
+        public SelectBuilder orderBy(String column, OrderBy.Order order) {
             mOrderBy = new OrderBy(column, order);
             return this;
         }
@@ -103,7 +116,7 @@ public class Select extends Query {
          * @param end The ending index to select from
          * @return Call Builder#execute, Builder#rx or Builder#rxSingle to run the query
          */
-        public Builder limit(int start, int end) {
+        public SelectBuilder limit(int start, int end) {
             mLimit = new Limit(start, end);
             return this;
         }
@@ -121,6 +134,22 @@ public class Select extends Query {
                     classDef,
                     sqlProvider
             );
+        }
+
+        /**
+         * Executes a Select query
+         * @param classDef The class definition that the query should run on
+         * @param tableAlias The table name to be used as an alias during the query
+         * @param sqlProvider Where the magic happens!
+         * @param <T> The model object returned from the query
+         * @return The rows returned by the Select query
+         */
+        public <T> T[] execute(Class<T> classDef, String tableAlias, SQLProvider sqlProvider) {
+        return select(
+                new Select(tableAlias, mClause, mJoin, mOrderBy, mLimit),
+                classDef,
+                sqlProvider
+                     );
         }
 
         /**

@@ -5,6 +5,7 @@ import com.google.googlejavaformat.java.Formatter;
 import com.google.googlejavaformat.java.FormatterException;
 import com.memtrip.sqlking.common.Column;
 import com.memtrip.sqlking.common.Table;
+import com.memtrip.sqlking.common.PrimaryKey;
 import com.memtrip.sqlking.common.Index;
 import com.memtrip.sqlking.common.IndexColumn;
 import com.memtrip.sqlking.common.ForeignKey;
@@ -17,6 +18,8 @@ import com.memtrip.sqlking.preprocessor.processor.data.validator.MembersHaveGett
 import com.memtrip.sqlking.preprocessor.processor.data.validator.PrimaryKeyMustBeUnique;
 import com.memtrip.sqlking.preprocessor.processor.data.validator.TableNamesMustBeUniqueValidator;
 import com.memtrip.sqlking.preprocessor.processor.freemarker.DataModel;
+
+import freemarker.template.TemplateException;
 
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.ProcessingEnvironment;
@@ -67,7 +70,7 @@ public class Processor extends AbstractProcessor {
             try {
                 String body = mFreeMarker.getMappedFileBodyFromTemplate(GENERATED_FILE_PATH, DataModel.create(data));
                 createFile(GENERATED_FILE_PACKAGE, GENERATED_FILE_NAME, body);
-            } catch (IOException | FormatterException e) {
+            } catch (IOException | FormatterException | TemplateException e) {
                 Context.getInstance().getMessager().printMessage(
                         Diagnostic.Kind.ERROR,
                         e.getMessage()
@@ -90,6 +93,7 @@ public class Processor extends AbstractProcessor {
 		set.add(Column.class.getCanonicalName());
         set.add(Index.class.getCanonicalName());
         set.add(IndexColumn.class.getCanonicalName());
+        set.add(PrimaryKey.class.getCanonicalName());
         set.add(ForeignKey.class.getCanonicalName());
         set.add(Constraint.class.getCanonicalName());
         set.add(Trigger.class.getCanonicalName());
@@ -113,7 +117,7 @@ public class Processor extends AbstractProcessor {
         };
     }
 
-	private void createFile(String packageName, String name, String body) throws IOException, FormatterException {
+	private void createFile(String packageName, String name, String body) throws IOException, FormatterException, TemplateException {
         String nameWithPackage = packageName + "." + name;
         JavaFileObject jfo = Context.getInstance().getFiler().createSourceFile(nameWithPackage);
 

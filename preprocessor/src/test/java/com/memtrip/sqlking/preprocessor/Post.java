@@ -4,9 +4,14 @@ import com.memtrip.sqlking.common.Column;
 import com.memtrip.sqlking.common.Table;
 import com.memtrip.sqlking.common.Index;
 import com.memtrip.sqlking.common.IndexColumn;
-import com.memtrip.sqlking.common.ForeignKey;
+import com.memtrip.sqlking.common.PrimaryKey;
 
 @Table(
+        primaryKey = @PrimaryKey(
+                active = true,
+                columns = {"id"},
+                auto_increment = true
+        ),
         indexes = {
               @Index(indexName = "timestamp",
                   columns = {
@@ -16,7 +21,7 @@ import com.memtrip.sqlking.common.ForeignKey;
         }
 )
 public class Post {
-    @Column(primary_key = true, auto_increment = true) int id;
+    @Column int id;
     @Column String title;
     @Column byte[] blob;
     @Column long timestamp;

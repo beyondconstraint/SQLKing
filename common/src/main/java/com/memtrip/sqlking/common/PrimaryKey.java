@@ -21,8 +21,9 @@ package com.memtrip.sqlking.common;
 
 public @interface PrimaryKey        // Table Level Primary key
     {
-    Column[] columns();
+    boolean active() default false;
+    String[] columns() default {};  // Used when the annotation is at table-level
+    boolean auto_increment () default true;
     SortOrder sortOrder() default SortOrder.ASC;
-    ConflictAction onConflict() default ConflictAction.ROLLBACK;
-    boolean autoIncrement() default false;
+    ConflictAction onConflict() default ConflictAction.NONE;
     }

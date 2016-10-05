@@ -10,32 +10,54 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.util.Map;
 
-final class FreeMarker {
+final class FreeMarker
+    {
     private Configuration mConfiguration;
 
     private static final String TEMPLATE_ENCODING = "UTF-8";
 
-    FreeMarker() throws IOException {
+    FreeMarker () throws IOException
+        {
         mConfiguration = createConfiguration();
-    }
+        }
 
-    private Configuration createConfiguration() throws IOException {
+    private Configuration createConfiguration () throws IOException
+        {
         Configuration configuration = new Configuration(Configuration.VERSION_2_3_21);
         configuration.setDefaultEncoding(TEMPLATE_ENCODING);
-        configuration.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
-        configuration.setClassForTemplateLoading(FreeMarker.class,"/");
+//        configuration.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
+        configuration.setTemplateExceptionHandler(TemplateExceptionHandler.DEBUG_HANDLER);
+        configuration.setClassForTemplateLoading(FreeMarker.class, "/");
+
         return configuration;
-    }
-
-    String getMappedFileBodyFromTemplate(String fileName, Map<String, Object> map) {
-        try {
-            return createFile(fileName, map);
-        } catch (Exception e) {
-            throw new IllegalStateException("Mapping template FAILED: " + e.getMessage());
         }
-    }
 
-    private String createFile(String file, Map<String, Object> map) throws TemplateException, IOException {
+    String getMappedFileBodyFromTemplate (String fileName, Map<String, Object> map)
+        {
+        try
+            {
+            return createFile(fileName, map);
+            }
+        catch (IOException ioe)
+            {
+            ioe.printStackTrace();
+            throw new IllegalStateException("Mapping template FAILED: " + ioe.getMessage());
+            }
+        catch (TemplateException te)
+            {
+            te.printStackTrace();
+            throw new IllegalStateException("Mapping template FAILED: " + te.getMessage());
+            }
+        catch (Exception e)
+            {
+            e.printStackTrace();
+            throw new IllegalStateException("Mapping template FAILED: " + e.getMessage());
+            }
+        }
+
+    private String createFile (String file, Map<String, Object> map) throws TemplateException,
+                                                                                    IOException
+        {
         Template template = getTemplate(file);
 
         Writer out = new StringWriter();
@@ -44,9 +66,11 @@ final class FreeMarker {
         out.close();
 
         return output;
-    }
+        }
 
-    private Template getTemplate(String fileName) throws IOException {
+    private Template getTemplate (String fileName) throws IOException
+        {
         return mConfiguration.getTemplate(fileName);
+        }
+
     }
-}

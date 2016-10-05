@@ -2,16 +2,17 @@ package com.memtrip.sqlking.preprocessor.processor.data;
 
 import java.util.List;
 
+
 public class Column {
     private String  mName;
     private String  mClassName;
     private String  mType;
-    private boolean mIsIndex;
-    private boolean mIsNotNull;
-    private boolean mPrimaryKey;
-    private boolean mHasAutoIncrement;
-    private String  mDefaultValue;
+    private PrimaryKey mPrimaryKey;
     private ForeignKey mForeignKey;
+    private boolean mIsIndex;
+    private NotNull mNotNull;
+    private boolean mUnique;
+    private String  mDefaultValue;
     private List<Constraint>  mConstraints;
 
     public String getName() {
@@ -35,9 +36,9 @@ public class Column {
         mType = newVal;
     }
 
-    /**
-     * (Used in Q.java freemarker template)
-     */
+    public PrimaryKey getPrimaryKey() { return mPrimaryKey; }
+    public void setPrimaryKey(PrimaryKey newVal) { mPrimaryKey = newVal; }
+
     public boolean isIndex() {
         return mIsIndex;
     }
@@ -45,28 +46,17 @@ public class Column {
         mIsIndex = newVal;
     }
 
-    public boolean isNotNull ()
+    public NotNull getNotNull ()
         {
-        return mIsNotNull;
+        return mNotNull;
         }
-    public void setNotNull (boolean newVal)
+    public void setNotNull (NotNull newVal)
         {
-        this.mIsNotNull = newVal;
+        this.mNotNull = newVal;
         }
 
-    public boolean hasPrimaryKey() {
-        return mPrimaryKey;
-    }
-    public void setHasPrimaryKey(boolean newVal) {
-        mPrimaryKey = newVal;
-    }
-
-    public boolean hasAutoIncrement() {
-        return mHasAutoIncrement;
-    }
-    public void setHasAutoIncrement(boolean newVal) {
-        mHasAutoIncrement = newVal;
-    }
+    public boolean isUnique () { return mUnique; }
+    public void setUnique (boolean mUnique) { this.mUnique = mUnique; }
 
     public String getDefaultValue ()
         {
@@ -80,14 +70,8 @@ public class Column {
     public ForeignKey getForeignKey () { return mForeignKey; }
     public void setForeignKey (ForeignKey newVal) { this.mForeignKey = newVal; }
 
-    public List<Constraint> getConstraints ()
-        {
-        return mConstraints;
-        }
-    public void setConstraints (List<Constraint> newVal)
-        {
-        this.mConstraints = newVal;
-        }
+    public List<Constraint> getConstraints () { return mConstraints; }
+    public void setConstraints (List<Constraint> newVal) { this.mConstraints = newVal; }
 
     public Table getRootTable (List<Table> tables) {
         if (isJoinable(tables)) {

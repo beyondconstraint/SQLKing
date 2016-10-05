@@ -23,15 +23,15 @@ import com.memtrip.sqlking.operation.clause.Clause;
 @SuppressWarnings("unchecked")
 public class CrossInnerJoin<J> extends Join {
 
-    public CrossInnerJoin(Class<J> table, Join join, Clause... clauses) {
-        super(table, join, clauses);
+    public CrossInnerJoin(Class<J> table, String tableAlias, Join join, Clause... clauses) {
+        super(table, tableAlias, join, clauses);
     }
 
-    public static CrossInnerJoin crossInnerJoin(Class<?> table, Clause... clauses) {
-        return new CrossInnerJoin(table, null, clauses);
+    public static CrossInnerJoin crossInnerJoin(Class<?> table, String tableAlias, Clause... clauses) {
+        return new CrossInnerJoin(table, tableAlias, null, clauses);
     }
 
-    public static CrossInnerJoin crossInnerJoin(Class<?> table, Join join, Clause... clauses) {
-        return new CrossInnerJoin(table, join, clauses);
+    public static CrossInnerJoin crossInnerJoin(Class<?> table, String tableAlias, Join join, Clause... clauses) {
+        return new CrossInnerJoin(table, tableAlias, join, clauses);
     }
 }

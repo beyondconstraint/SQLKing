@@ -7,10 +7,10 @@ import java.util.List;
 public class Table {
     private Element mElement;
     private String mName;
-    private String mAliasName = "";
     private String mPackage;
     private String mType;
     private List<Column> mColumns;
+    private PrimaryKey mPrimaryKey;
     private List<ForeignKey> mForeignKeys;
     private List<Index> mIndexes;
     private List<Constraint> mConstraints;
@@ -24,14 +24,11 @@ public class Table {
     }
 
     public String getName() {
-        return mAliasName.length() > 0 ? mAliasName : mName;
+        return mName;
     }
     public void setName(String newVal) {
         mName = newVal;
     }
-
-    public String getAliasName () { return mAliasName; }
-    public void setAliasName (String newVal) { this.mAliasName = mAliasName; };
 
     public String getPackage () {
         return mPackage;
@@ -40,9 +37,6 @@ public class Table {
         mPackage = newVal;
     }
 
-    /**
-     * (Used in Q.java freemarker template)
-     */
     public String getType() {
         return mType;
     }
@@ -57,16 +51,19 @@ public class Table {
         mColumns = newVal;
     }
 
+    public PrimaryKey getPrimaryKey() { return mPrimaryKey; }
+    public void setPrimaryKey(PrimaryKey newVal) { mPrimaryKey = newVal; }
+    
     public List<ForeignKey> getForeignKeys() {
-        return mForeignKeys;
+    return mForeignKeys;
     }
     public void setForeignKeys(List<ForeignKey> newVal) {
-        mForeignKeys = newVal;
+    mForeignKeys = newVal;
     }
-
+    
     public List<Index> getIndexes() {
-    return mIndexes;
-    }
+        return mIndexes;
+        }
     public void setIndexes(List<Index> newVal) {
     mIndexes = newVal;
     }
@@ -77,10 +74,6 @@ public class Table {
     public List<Trigger> getTriggers () { return mTriggers; }
     public void setTriggers (List<Trigger> newVal) { this.mTriggers = newVal; }
 
-/**
-     * (Used in Q.java freemarker template)
-     * @return  all columns ignoring any object mappings
-     */
     public List<Column> getMutableColumns(List<Table> tables) {
         List<Column> withoutObjects = new ArrayList<>();
 

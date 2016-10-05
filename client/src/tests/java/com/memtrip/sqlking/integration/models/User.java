@@ -16,8 +16,7 @@ import com.memtrip.sqlking.common.Table;
         },
         indexes = {
               @Index(indexName = "username",
-                      indexColumns = {
-                         @IndexColumn(column = "username")}
+                      columns = { @IndexColumn(column = "username") }
               )
         }
 )
@@ -35,7 +34,6 @@ public class User  {
     public int getId() {
         return id;
     }
-
     public void setId(int id) {
         this.id = id;
     }
@@ -43,7 +41,6 @@ public class User  {
     public String getUsername() {
         return username;
     }
-
     public void setUsername(String newVal) {
         username = newVal;
     }
@@ -51,7 +48,6 @@ public class User  {
     public long getTimestamp() {
         return timestamp;
     }
-
     public void setTimestamp(long newVal) {
         timestamp = newVal;
     }
@@ -59,7 +55,6 @@ public class User  {
     public boolean getIsRegistered() {
         return isRegistered;
     }
-
     public void setIsRegistered(boolean newVal) {
         isRegistered = newVal;
     }
@@ -67,7 +62,6 @@ public class User  {
     public byte[] getProfilePicture() {
         return profilePicture;
     }
-
     public void setProfilePicture(byte[] newVal) {
         profilePicture = newVal;
     }
@@ -75,7 +69,6 @@ public class User  {
     public double getRating() {
         return rating;
     }
-
     public void setRating(double rating) {
         this.rating = rating;
     }
@@ -83,7 +76,6 @@ public class User  {
     public int getCount() {
         return count;
     }
-
     public void setCount(int count) {
         this.count = count;
     }
@@ -91,7 +83,6 @@ public class User  {
     public int getLogId() {
         return logId;
     }
-
     public void setLogId(int logId) {
         this.logId = logId;
     }
@@ -99,7 +90,6 @@ public class User  {
     public Log getLog() {
         return log;
     }
-
     public void setLog(Log log) {
         this.log = log;
     }

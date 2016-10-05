@@ -20,7 +20,7 @@ package com.memtrip.sqlking.common;
  */
 
 public @interface Constraint {
-    String constraintName();
+    String constraintName() default "";
     String expression();
-    ConflictAction onConflict() default ConflictAction.NA;
+    ConflictAction onConflict() default ConflictAction.NONE;
 }

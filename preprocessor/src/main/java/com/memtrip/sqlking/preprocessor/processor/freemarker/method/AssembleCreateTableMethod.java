@@ -4,6 +4,7 @@ import com.memtrip.sqlking.common.ConflictAction;
 
 import com.memtrip.sqlking.preprocessor.processor.data.Column;
 import com.memtrip.sqlking.preprocessor.processor.data.ForeignKey;
+import com.memtrip.sqlking.preprocessor.processor.data.PrimaryKey;
 import com.memtrip.sqlking.preprocessor.processor.data.IndexColumn;
 import com.memtrip.sqlking.preprocessor.processor.data.Index;
 import com.memtrip.sqlking.preprocessor.processor.data.Table;
@@ -46,10 +47,13 @@ public class AssembleCreateTableMethod implements TemplateMethodModelEx {
     private String buildCreateTableStatement(Table table, List<Table> tables)
         {
         StringBuilder sb = new StringBuilder();
+        int tableConstraintCount = 0;
 
         sb.append("CREATE TABLE ");
         sb.append(table.getName());
         sb.append(" (");
+
+//......Columns and column contraints
 
         for (int i = 0; i < table.getColumns().size(); i++)
             {
@@ -61,34 +65,55 @@ public class AssembleCreateTableMethod implements TemplateMethodModelEx {
                     .append(" ")
                     .append(getSQLDataTypeFromClassRef(column.getType()));
 
-                if (column.hasPrimaryKey())
+                if (column.getPrimaryKey() != null && column.getPrimaryKey().isActive() == true)
                     {
                     sb.append(" PRIMARY KEY");
-                    if (column.hasAutoIncrement())
+
+                    if (column.getPrimaryKey().isAutoNumber())
                         {
                         sb.append(" AUTOINCREMENT");
                         }
-                    else if (column.isNotNull())
+
+                    if (column.getPrimaryKey().getOnConflict() != ConflictAction.NONE)
+                        {
+                        sb.append(" ON CONFLICT ")
+                            .append (column.getPrimaryKey().getOnConflict().toString());
+                        }
+
+                    }
+
+                if (column.getNotNull() != null)
+                    {
+                    if (column.getNotNull().getOnConflict() != ConflictAction.NONE )
                         {
                         sb.append(" NOT NULL");
+                        sb.append(" ON CONFLICT ");
+                        sb.append(column.getNotNull().getOnConflict().toString());
                         }
-                    else if (column.getDefaultValue().length() > 0 )
-                        {
-                        sb.append(" DEFAULT ")
-                          .append(column.getDefaultValue());
-                        }
-                    else if (column.getForeignKey().getForeignTableName().length() > 0)
-                        {
-                        sb.append(" FOREIGN KEY REFERENCES ")
-                                .append(column.getForeignKey().getForeignTableName())
-                                .append(" (")
-                                .append(column.getForeignKey().getForeignColumnNames().get(0))
-                                .append(")");
-                        }
+                    }
+                else if (column.getDefaultValue().length() > 0 )
+                    {
+                    sb.append(" DEFAULT ")
+                      .append(column.getDefaultValue());
+                    }
+                else if (column.getForeignKey().getForeignTableName().length() > 0)
+                    {
+                    ForeignKey foreignKey = column.getForeignKey();
+
+                    sb.append(" FOREIGN KEY ")
+                            .append(table.getName().toLowerCase() + "_" + foreignKey.getForeignTableName().toLowerCase() + "_" + column.getName().toLowerCase() + "_fk")
+                            .append("(")
+                            .append(foreignKey.getLocalColumnNames().get(0).replaceAll("\\[|\\]", ""))
+                            .append(") REFERENCES ")
+                            .append(column.getForeignKey().getForeignTableName())
+                            .append(" (")
+                            .append(column.getForeignKey().getForeignColumnNames().get(0).replaceAll("\\[|\\]", ""))
+                            .append(")");
+                    }
 
                 for (Constraint constraint : column.getConstraints())
                     {
-                    if (constraint.getOnConflict() != ConflictAction.NA)
+                    if (constraint.getOnConflict() != ConflictAction.NONE)
                         {
                         sb.append(" CONSTRAINT ")
                                 .append(constraint.getConstraintName())
@@ -99,16 +124,60 @@ public class AssembleCreateTableMethod implements TemplateMethodModelEx {
                                  .append(constraint.getOnConflict().toString());
                         }
                     }
+                sb.append(",");
                 }
-            sb.append(",");
             }
-        }
+
         sb.deleteCharAt(sb.length() - 1);
 
+//......Table constraints and triggers
+
+        PrimaryKey primaryKey = table.getPrimaryKey();
+
+        if (primaryKey != null && primaryKey.isActive() == true)
+            {
+            tableConstraintCount++;
+
+            sb.append (" PRIMARY KEY")
+                    .append("(")
+                    .append(primaryKey.getColumns())
+                    .append(")");
+
+            if (primaryKey.getOnConflict() != ConflictAction.NONE)
+                {
+                sb.append(" ON CONFLICT ")
+                        .append(primaryKey.getOnConflict().toString());
+                }
+            }
+
+        int fkCount = 1;
+
+        for (ForeignKey foreignKey : table.getForeignKeys())
+            {
+            if (tableConstraintCount > 0)
+                {
+                sb.append(", ");
+                }
+
+            tableConstraintCount++;
+
+            sb.append(" FOREIGN KEY ")
+                    .append(table.getName().toLowerCase() + "_" + foreignKey.getForeignTableName().toLowerCase() + "_" + fkCount + "_fk")
+                    .append(" (")
+                    .append(foreignKey.getLocalColumnNames().toString().replaceAll("\\[|\\]", ""))
+                    .append(") REFERENCES ")
+                    .append(foreignKey.getForeignTableName())
+                    .append(" (")
+                    .append(foreignKey.getForeignColumnNames().toString().replaceAll("\\[|\\]", ""))
+                    .append(")");
+            fkCount++;
+            }
         sb.append(");");
 
-        return "\"" + sb.toString() + "\";";
-    }
+        System.out.println("++ " + sb.toString());
+
+        return "\"" + sb.toString() + "\"";
+        }
 
     /**
      * Determine the data type of the provided class reference and return

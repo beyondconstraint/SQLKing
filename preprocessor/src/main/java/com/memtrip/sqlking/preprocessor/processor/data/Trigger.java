@@ -1,7 +1,3 @@
-/**
- * Author: A.Velcich
- */
-
 package com.memtrip.sqlking.preprocessor.processor.data;
 
 /**
@@ -9,7 +5,6 @@ package com.memtrip.sqlking.preprocessor.processor.data;
  */
 
 import java.util.List;
-import com.memtrip.sqlking.preprocessor.processor.utils.StringUtils;
 import com.memtrip.sqlking.common.TriggerTime;
 import com.memtrip.sqlking.common.TriggerType;
 

@@ -35,41 +35,40 @@ public class AssembleCreateTriggersMethod implements TemplateMethodModelEx
     private String buildCreateTriggerStatements (Table table)
         {
         StringBuilder sb = new StringBuilder();
-        StringBuilder sbDebug = new StringBuilder();
 
         List<Trigger> triggerList = table.getTriggers();
 
         for (Trigger trigger : triggerList)
             {
-            sb.append(" CREATE TRIGGER ")
-                    .append(table.getName())
-                    .append("_")
-                    .append(trigger.getTriggerName())
-                    .append(" ")
-                    .append(trigger.getTriggerTime().toString())
-                    .append(" ");
-
-            if (trigger.getOnUpdateOfColumnNames().size() > 0)
-                {
-                sb.append("OF ");
-
-                for (String columnName : trigger.getOnUpdateOfColumnNames())
-                    {
-                    sb.append(columnName);
-                    sb.append(",");
-                    }
-                sb.deleteCharAt(sb.length() -1);
-                }
-
-            sb.append(" ON ")
-                    .append(table.getName());
-
-            if (trigger.isForEachRow())
-                {
-                sb.append(" FOR EACH ROW ");
-                }
-
-            sb.append(trigger.getStatement());
+//            sb.append(" CREATE TRIGGER ")
+//                    .append(table.getName())
+//                    .append("_")
+//                    .append(trigger.getTriggerName())
+//                    .append(" ")
+//                    .append(trigger.getTriggerTime().toString())
+//                    .append(" ");
+//
+//            if (trigger.getOnUpdateOfColumnNames().size() > 0)
+//                {
+//                sb.append("OF ");
+//
+//                for (String columnName : trigger.getOnUpdateOfColumnNames())
+//                    {
+//                    sb.append(columnName);
+//                    sb.append(",");
+//                    }
+//                sb.deleteCharAt(sb.length() -1);
+//                }
+//
+//            sb.append(" ON ")
+//                    .append(table.getName());
+//
+//            if (trigger.isForEachRow())
+//                {
+//                sb.append(" FOR EACH ROW ");
+//                }
+//
+//            sb.append(trigger.getStatement());
             }
 
         if (sb.length() > 0) { sb.deleteCharAt(sb.length() - 1); }

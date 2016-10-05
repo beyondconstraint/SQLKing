@@ -23,15 +23,35 @@ import com.memtrip.sqlking.operation.clause.Clause;
 @SuppressWarnings("unchecked")
 public class InnerJoin<J> extends Join {
 
+    public InnerJoin (Class<J> table, Clause... clauses) {
+        super(table, clauses);
+    }
+
     public InnerJoin(Class<J> table, Join join, Clause... clauses) {
         super(table, join, clauses);
     }
 
+    public InnerJoin(Class<J> table, String tableAlias, Clause... clauses) {
+        super(table, tableAlias, clauses);
+    }
+
+    public InnerJoin(Class<J> table, String tableAlias, Join join, Clause... clauses) {
+        super(table, tableAlias, join, clauses);
+    }
+
     public static InnerJoin innerJoin(Class<?> table, Clause... clauses) {
-        return new InnerJoin(table, null, clauses);
+        return new InnerJoin(table, clauses);
     }
 
     public static InnerJoin innerJoin(Class<?> table, Join join, Clause... clauses) {
-        return new InnerJoin(table, join, clauses);
+        return new InnerJoin(table, clauses);
+    }
+
+    public static InnerJoin innerJoin(Class<?> table, String tableAlias, Clause... clauses) {
+        return new InnerJoin(table, tableAlias, clauses);
+    }
+
+    public static InnerJoin innerJoin(Class<?> table, String tableAlias, Join join, Clause... clauses) {
+        return new InnerJoin(table, tableAlias, join, clauses);
     }
 }

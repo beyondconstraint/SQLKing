@@ -1,8 +1,12 @@
 package com.memtrip.sqlking.preprocessor.processor.data;
 
+/**
+ * Author: A.Velcich
+ */
+
 import java.util.List;
 import com.memtrip.sqlking.common.RIRule;
-import com.memtrip.sqlking.preprocessor.processor.utils.StringUtils;
+
 public class ForeignKey
     {
     private String       mForeignTableName;

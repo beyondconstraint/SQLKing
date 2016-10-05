@@ -8,7 +8,7 @@ public class Constraint
     {
     private String          mConstraintName;
     private String          mConstraintExpression;
-    private ConflictAction  mOnConflict = ConflictAction.NA;
+    private ConflictAction  mOnConflict = ConflictAction.NONE;
 
     public String getConstraintName ()
         {

@@ -52,16 +52,16 @@ public class AssembleCreateForeignKeysMethod implements TemplateMethodModelEx
 
         for (ForeignKey foreignKey : foreignKeyList)
             {
-            sb.append("CREATE FOREIGN KEY(")
+            sb.append("CONSTRAINT FOREIGN KEY(")
                     .append(foreignKey.getLocalColumnNames().toString().replaceAll("[\\[\\]]", ""))
                     .append(") REFERENCES ")
                     .append(foreignKey.getForeignTableName())
                     .append("(")
                     .append(foreignKey.getForeignColumnNames().toString().replaceAll("[\\[\\]]", ""))
-                    .append(");");
+                    .append(") ");
             }
 
-        return "\"" + sb.toString() + "\";";
+        return "\"" + sb.toString() + "\"";
         }
 
 

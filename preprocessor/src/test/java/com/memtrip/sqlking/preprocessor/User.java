@@ -1,11 +1,15 @@
 package com.memtrip.sqlking.preprocessor;
 
+//import com.memtrip.sqlking.common.*;
 import com.memtrip.sqlking.common.Column;
+import com.memtrip.sqlking.common.PrimaryKey;
 import com.memtrip.sqlking.common.ForeignKey;
 import com.memtrip.sqlking.common.Table;
 import com.memtrip.sqlking.common.Index;
 import com.memtrip.sqlking.common.IndexColumn;
 import com.memtrip.sqlking.common.Constraint;
+import com.memtrip.sqlking.common.NotNull;
+import com.memtrip.sqlking.common.ConflictAction;
 
 @Table(
         indexes = {
@@ -29,7 +33,9 @@ import com.memtrip.sqlking.common.Constraint;
 )
 
 public class User  {
-    @Column String username;
+    @Column(primaryKey = @PrimaryKey(active = true, auto_increment = false),
+            notNull = @NotNull(onConflict = ConflictAction.ROLLBACK))
+            String username;
     @Column long timestamp;
     @Column boolean isRegistered;
     @Column byte[] profilePicture;

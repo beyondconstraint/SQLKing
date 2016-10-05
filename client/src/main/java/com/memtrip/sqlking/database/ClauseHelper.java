@@ -49,7 +49,7 @@ public class ClauseHelper {
     private static final String AND = "AND";
     private static final String OR = "OR";
 
-    protected ClauseHelper() { }
+    protected ClauseHelper() {}
 
     public String getClause(Clause[] clause) {
         StringBuilder clauseBuilder = new StringBuilder();
@@ -59,7 +59,6 @@ public class ClauseHelper {
                 clauseBuilder.append(getClause(item));
             }
         }
-
         return clauseBuilder.toString();
     }
 
@@ -74,7 +73,9 @@ public class ClauseHelper {
             clauseBuilder.append(buildOnCondition((On) clause));
         } else if (clause instanceof And) {
             clauseBuilder.append(BRACKET_START);
+
             And and = (And)clause;
+
             for (Clause item : and.getClause()) {
                 clauseBuilder.append(getClause(item));
                 clauseBuilder.append(SPACE);
@@ -85,6 +86,7 @@ public class ClauseHelper {
             // remove the excess AND with its 2 spaces
             clauseBuilder.delete(clauseBuilder.length() - 5, clauseBuilder.length());
             clauseBuilder.append(BRACKET_END);
+
         } else if (clause instanceof Or) {
             clauseBuilder.append(BRACKET_START);
             Or or = (Or)clause;
@@ -133,7 +135,6 @@ public class ClauseHelper {
                 stringBuilder.append(VALUE);
                 stringBuilder.append(COMMA);
             }
-
             stringBuilder.delete(stringBuilder.length() - 1, stringBuilder.length());
         }
 
@@ -241,52 +242,60 @@ public class ClauseHelper {
     }
 
     public String getJoinStatement(Join[] joins, Resolver resolver) {
-        StringBuilder stringBuilder = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
 
         for (Join join : joins) {
             SQLQuery sqlQuery = resolver.getSQLQuery(join.getTable());
+            String tableAliasName = join.getTableAliasName();
+
             String tableName = sqlQuery.getTableName();
 
-            stringBuilder
-            		.append(" ")
-            		.append(getJoinType(join))
-                    .append(" ")
-                    .append(tableName)
-                    .append(" ")
-                    .append(getClause(join.getClauses()));
+            sb.append(" ")
+                .append(getJoinType(join))
+                .append(" ")
+                .append(tableName);
+
+            if (tableAliasName.length() > 0)
+                {
+                sb.append(" AS ")
+                  .append(tableAliasName);
+                }
+
+            sb.append(" ")
+                .append(getClause(join.getClauses()));
 
             if (join.getJoin() != null) {
-                stringBuilder.append(" ")
-                        .append(getJoinStatement(new Join[] { join.getJoin() }, resolver));
+                sb.append(" ")
+                     .append(getJoinStatement(new Join[] { join.getJoin() }, resolver));
             }
         }
 
-        return stringBuilder.toString();
+        return sb.toString();
     }
 
-    public String buildJoinQuery(String[] tableColumns, Join[] joins, String tableName, Clause[] clause,
+    public String buildJoinQuery(String[] tableColumns, Join[] joins, String tableName, String tableAlias, Clause[] clause,
                                   OrderBy orderBy, Limit limit, Resolver resolver) {
 
         String[] joinColumns = getJoinColumns(joins, resolver);
 
-        StringBuilder stringBuilder = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
 
-        stringBuilder.append("SELECT ");
+        sb.append("SELECT ");
 
         for (String column : tableColumns) {
-            stringBuilder.append(column).append(", ");
+            sb.append(column).append(", ");
         }
 
         for (String column : joinColumns) {
             String columnAlias = column.replace(".","_");
-            stringBuilder.append(column)
+            sb.append(column)
                     .append(" as ")
                     .append(columnAlias)
                     .append(", ");
         }
 
         // remove the trailing comma
-        stringBuilder.delete(stringBuilder.length()-2, stringBuilder.length());
+        sb.delete(sb.length()-2, sb.length());
 
         String clauseString = getClause(clause);
         if (clauseString != null && clauseString.length() > 0) {
@@ -303,9 +312,14 @@ public class ClauseHelper {
             limitString = "LIMIT " + limitString;
         }
 
-        stringBuilder.append(" FROM ")
-                .append(tableName)
-                .append(" ")
+        sb.append(" FROM ")
+                .append(tableName);
+                if (tableAlias.length() > 0)
+                    {
+                    sb.append(" AS ")
+                            .append(tableAlias);
+                    }
+        sb.append(" ")
                 .append(getJoinStatement(joins, resolver))
                 .append(" ")
                 .append(clauseString)
@@ -314,7 +328,7 @@ public class ClauseHelper {
                 .append(" ")
                 .append(limitString);
 
-        return stringBuilder.toString();
+        return sb.toString();
     }
 
     private String[] getJoinColumns(Join[] joins, Resolver resolver) {

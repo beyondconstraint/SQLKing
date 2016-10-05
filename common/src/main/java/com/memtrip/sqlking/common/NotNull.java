@@ -16,18 +16,9 @@
 package com.memtrip.sqlking.common;
 
 /**
- * @author Samuel Kirton [sam@memtrip.com]
- * @author Adrian Velcich {adrian@higration.co.za}
+ * @author Adrian Velcich [adrian@higration.co.za]
  */
 
-@SuppressWarnings("WeakerAccess")
-public @interface ForeignKey    // table level Foreign Key - allows for a composite key (multiple columns)
-    {
-    String foreignTableName () default "";
-    String foreignTableAlias () default "";
-    String[] foreignColumnNames () default {};
-    String[] localColumnNames () default {};
-    RIRule updateRule () default RIRule.Cascade;
-    RIRule deleteRule () default RIRule.Restrict;
-    String userText() default "";
+public @interface NotNull {
+    ConflictAction onConflict() default ConflictAction.NONE;
 }

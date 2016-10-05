@@ -21,7 +21,7 @@ package com.memtrip.sqlking.common;
 
 public enum ConflictAction
     {
-    NA          ("NA"),
+    NONE        ("NONE"),
     ROLLBACK    ("ROLLBACK"),
     ABORT       ("ABORT"),
     FAIL        ("FAIL"),

@@ -4,9 +4,11 @@ import com.memtrip.sqlking.common.ConflictAction;
 
 import com.memtrip.sqlking.common.TriggerType;
 import com.memtrip.sqlking.common.TriggerTime;
+import com.memtrip.sqlking.common.SortOrder;
 
 import com.memtrip.sqlking.preprocessor.processor.Context;
 import com.memtrip.sqlking.preprocessor.processor.data.Column;
+import com.memtrip.sqlking.preprocessor.processor.data.PrimaryKey;
 import com.memtrip.sqlking.preprocessor.processor.data.ForeignKey;
 import com.memtrip.sqlking.preprocessor.processor.data.Index;
 import com.memtrip.sqlking.preprocessor.processor.data.IndexColumn;
@@ -30,18 +32,24 @@ class ParseTableAnnotation
         String name                     = assembleName(element);
         String tablePackage             = assemblePackage(element);
         String type                     = tablePackage + "." + name;
+
+        System.out.println("++ Preprocessing table: " + type);
+
         List<Column> columns            = assembleColumns(element);
+        PrimaryKey primaryKey           = assemblePrimaryKey(element);
         List<ForeignKey> foreignKeys    = assembleForeignKeys(element);
-        List<Index> indexes             = assembleIndexes(element);
+        List<Index> indexes             = assembleIndexes(element, columns);
         List<Constraint> constraints    = assembleConstraints(element);
         List<Trigger> triggers          = assembleTriggers(element);
 
         Table table = new Table();
+
         table.setElement(element);
         table.setName(name);
         table.setPackage(tablePackage);
         table.setType(type);
         table.setColumns(columns);
+        table.setPrimaryKey(primaryKey);
         table.setForeignKeys(foreignKeys);
         table.setIndexes(indexes);
         table.setConstraints (constraints);
@@ -74,7 +82,24 @@ class ParseTableAnnotation
         return columns;
     }
 
-    private static List<Index> assembleIndexes (Element element)
+    private static PrimaryKey assemblePrimaryKey(Element element) {
+        com.memtrip.sqlking.common.Table tableAnnotation = element.getAnnotation(com.memtrip.sqlking.common.Table.class);
+        com.memtrip.sqlking.common.PrimaryKey primaryKeyAnnotation = tableAnnotation.primaryKey();
+
+        if (primaryKeyAnnotation != null && primaryKeyAnnotation.active() == true)
+            {
+            PrimaryKey primaryKey = new PrimaryKey();
+
+            primaryKey.setColumns(primaryKeyAnnotation.columns());
+            primaryKey.setAutoNumber(primaryKeyAnnotation.auto_increment());
+            primaryKey.setOnConflict (primaryKeyAnnotation.onConflict());
+
+            return primaryKey;
+            }
+        return null;
+    }
+
+    private static List<Index> assembleIndexes (Element element, List<Column> columns)
         {
         com.memtrip.sqlking.common.Table tableAnnotation = element.getAnnotation(com.memtrip.sqlking.common.Table.class);
         com.memtrip.sqlking.common.Index[] indexesAnnotation = tableAnnotation.indexes();
@@ -109,6 +134,31 @@ class ParseTableAnnotation
 
             indexes.add(index);
             }
+
+        for (Column column : columns)
+            {
+            if (column.isIndex())
+                {
+                Index index = new Index();
+
+                index.setTableName(tableName);
+                index.setIndexName(column.getName());
+                index.setUnique(false);
+
+                List<IndexColumn> idxColumns = new ArrayList<>();
+
+                IndexColumn columnIndex = new IndexColumn();
+
+                columnIndex.setColumn(column.getName());
+                columnIndex.setSortOrder(SortOrder.ASC);
+
+                idxColumns.add(columnIndex);
+                index.setColumns(idxColumns);
+
+                indexes.add(index);
+                }
+            }
+
         return indexes;
         }
 
@@ -174,28 +224,31 @@ class ParseTableAnnotation
 
         List<Trigger> triggers = new ArrayList<>();
 
-        for (com.memtrip.sqlking.common.Trigger triggerAnnotation : triggersAnnotation)
+        if (triggersAnnotation != null && triggersAnnotation.length > 0)
             {
-            Trigger trigger = new Trigger();
-
-            trigger.setTriggerName(triggerAnnotation.triggerName());
-            trigger.setTriggerTime(triggerAnnotation.triggerTime());
-            trigger.setTriggerType(triggerAnnotation.triggerType());
-
-            List<String> onUpdateColumns = new ArrayList<>();
-
-            for (String columnName : triggerAnnotation.updateOfColumnNames())
+            for (com.memtrip.sqlking.common.Trigger triggerAnnotation : triggersAnnotation)
                 {
-                onUpdateColumns.add(columnName);
+                Trigger trigger = new Trigger();
+
+                trigger.setTriggerName(triggerAnnotation.triggerName());
+                trigger.setTriggerTime(triggerAnnotation.triggerTime());
+                trigger.setTriggerType(triggerAnnotation.triggerType());
+
+                List<String> onUpdateColumns = new ArrayList<>();
+
+                for (String columnName : triggerAnnotation.updateOfColumnNames())
+                    {
+                    onUpdateColumns.add(columnName);
+                    }
+
+                trigger.setOnUpdateOfColumnNames(onUpdateColumns);
+
+                trigger.setForEachRow(triggerAnnotation.forEachRow());
+                trigger.setWhenExpression(triggerAnnotation.whenExpression());
+                trigger.setStatement(triggerAnnotation.statement());
+
+                triggers.add(trigger);
                 }
-
-            trigger.setOnUpdateOfColumnNames(onUpdateColumns);
-
-            trigger.setForEachRow(triggerAnnotation.forEachRow());
-            trigger.setWhenExpression(triggerAnnotation.whenExpression());
-            trigger.setStatement(triggerAnnotation.statement());
-
-            triggers.add(trigger);
             }
 
         return triggers;

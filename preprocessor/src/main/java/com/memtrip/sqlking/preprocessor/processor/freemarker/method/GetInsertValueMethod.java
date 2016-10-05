@@ -28,7 +28,7 @@ public class GetInsertValueMethod implements TemplateMethodModelEx {
 
     private String assembleInsertValue(Column column, String getter)
         {
-        if (column.hasPrimaryKey() && column.hasAutoIncrement())
+        if (column.getPrimaryKey() != null && column.getPrimaryKey().isAutoNumber())
             {
             return "NULL";
             }

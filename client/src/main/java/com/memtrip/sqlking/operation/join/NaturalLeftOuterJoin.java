@@ -23,15 +23,15 @@ import com.memtrip.sqlking.operation.clause.Clause;
 @SuppressWarnings("unchecked")
 public class NaturalLeftOuterJoin<J> extends Join {
 
-    public NaturalLeftOuterJoin(Class<J> table, Join join, Clause... clauses) {
-        super(table, join, clauses);
+    public NaturalLeftOuterJoin(Class<J> table, String tableAlias, Join join, Clause... clauses) {
+        super(table, tableAlias, join, clauses);
     }
 
-    public static NaturalLeftOuterJoin naturalLeftOuterJoin(Class<?> table, Clause... clauses) {
-        return new NaturalLeftOuterJoin(table, null, clauses);
+    public static NaturalLeftOuterJoin naturalLeftOuterJoin(Class<?> table, String tableAlias, Clause... clauses) {
+        return new NaturalLeftOuterJoin(table, tableAlias, null, clauses);
     }
 
-    public static NaturalLeftOuterJoin naturalLeftOuterJoin(Class<?> table, Join join, Clause... clauses) {
-        return new NaturalLeftOuterJoin(table, join, clauses);
+    public static NaturalLeftOuterJoin naturalLeftOuterJoin(Class<?> table, String tableAlias, Join join, Clause... clauses) {
+        return new NaturalLeftOuterJoin(table, tableAlias, join, clauses);
     }
 }

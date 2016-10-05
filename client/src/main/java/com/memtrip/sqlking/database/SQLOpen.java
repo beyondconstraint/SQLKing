@@ -67,13 +67,13 @@ public class SQLOpen extends SQLiteOpenHelper {
 		}
 
 		for (String createIndex : mCreateIndexStatements) {
-			if (createIndex != null) {
+			if (createIndex != null && createIndex.length() > 0) {
 				db.execSQL(createIndex);
 			}
 		}
 
 		for (String createTrigger : mCreateTriggerStatements) {
-			if (createTrigger != null) {
+			if (createTrigger != null && createTrigger.length() > 0) {
 				db.execSQL(createTrigger);
 			}
 		}

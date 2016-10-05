@@ -55,7 +55,7 @@ public class Q {
 
             @Override
             public String getTableCreateQuery() {
-               return ${assembleCreateTable(table, tables)}
+               return ${assembleCreateTable(table, tables)};
             }
 
             @Override
@@ -67,7 +67,7 @@ public class Q {
                     </#if>
                 </#list>
                 <#list table.getIndexes() as index>
-                        "${table.getName()}_${index.getIndexName()}_index",
+                        "${table.getName()?lower_case}_${index.getIndexName()?lower_case}_index",
                 </#list>
                 };
             }
@@ -80,6 +80,7 @@ public class Q {
                 </#list>
                 };
             }
+
             @Override
             public String getCreateIndexesQuery() {
                 return ${assembleCreateIndexes(table)};
@@ -88,7 +89,6 @@ public class Q {
             @Override
             public String getCreateTriggersQuery() {
                 return ${assembleCreateTriggers(table)};
-
             }
 
             @Override

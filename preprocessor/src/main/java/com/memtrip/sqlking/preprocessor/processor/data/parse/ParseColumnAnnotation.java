@@ -1,8 +1,11 @@
 package com.memtrip.sqlking.preprocessor.processor.data.parse;
 
 import com.memtrip.sqlking.preprocessor.processor.data.Column;
+import com.memtrip.sqlking.preprocessor.processor.data.Index;
 import com.memtrip.sqlking.preprocessor.processor.data.Constraint;
 import com.memtrip.sqlking.preprocessor.processor.data.ForeignKey;
+import com.memtrip.sqlking.preprocessor.processor.data.PrimaryKey;
+import com.memtrip.sqlking.preprocessor.processor.data.NotNull;
 
 import javax.lang.model.element.Element;
 import javax.lang.model.element.Name;
@@ -19,25 +22,24 @@ class ParseColumnAnnotation {
         String className = assembleClassName(type);
 
         boolean isIndex = assembleIsIndex(element);
-        boolean hasPrimaryKey = assemblePrimaryKey(element);
-        boolean hasAutoIncrement = assembleAutoIncrement(element);
-        boolean isNotNotNull = assembleNotNull(element);
+        PrimaryKey primaryKey = assemblePrimaryKey(element);
+        NotNull notNull = assembleNotNull(element);
         String defaultValue = assembleDefaultValue(element);
         ForeignKey foreignKey = assembleForeignKey(element);
         List<Constraint> constraints = assembleConstraints(element);
+
+        System.out.println("    ++ column: " + name);
 
         Column column = new Column();
         column.setName(name);
         column.setType(type);
         column.setClassName(className);
         column.setIsIndex(isIndex);
-        column.setHasPrimaryKey(hasPrimaryKey);
-        column.setHasAutoIncrement(hasAutoIncrement);
-        column.setNotNull(isNotNotNull);
+        column.setPrimaryKey(primaryKey);
+        column.setNotNull(notNull);
         column.setDefaultValue(defaultValue);
         column.setConstraints(constraints);
         column.setForeignKey(foreignKey);
-        column.setConstraints(constraints);
 
         return column;
     }
@@ -59,22 +61,43 @@ class ParseColumnAnnotation {
 
     private static boolean assembleIsIndex(Element element) {
         com.memtrip.sqlking.common.Column column = element.getAnnotation(com.memtrip.sqlking.common.Column.class);
-        return column != null && column.index();
+        return column != null && column.isIndex();
     }
 
-    private static boolean assemblePrimaryKey(Element element) {
-        com.memtrip.sqlking.common.Column column = element.getAnnotation(com.memtrip.sqlking.common.Column.class);
-        return column.primary_key();
+    private static PrimaryKey assemblePrimaryKey(Element element) {
+        com.memtrip.sqlking.common.Column columnAnnotation = element.getAnnotation(com.memtrip.sqlking.common.Column.class);
+        String columnName = element.getSimpleName().toString();
+
+        com.memtrip.sqlking.common.PrimaryKey primaryKeyAnnotation = columnAnnotation.primaryKey();
+
+        if (primaryKeyAnnotation != null && primaryKeyAnnotation.active() == true)
+            {
+            PrimaryKey primaryKey = new PrimaryKey();
+
+            primaryKey.setIsActive(true);
+            primaryKey.setColumns(new String[] {columnName});
+            primaryKey.setAutoNumber(primaryKeyAnnotation.auto_increment());
+            primaryKey.setOnConflict (primaryKeyAnnotation.onConflict());
+
+            return primaryKey;
+            }
+        return null;
     }
 
-    private static boolean assembleAutoIncrement(Element element) {
+    private static NotNull assembleNotNull(Element element) {
         com.memtrip.sqlking.common.Column column = element.getAnnotation(com.memtrip.sqlking.common.Column.class);
-        return column.auto_increment();
-    }
+        com.memtrip.sqlking.common.NotNull notNullAnnotation = column.notNull();
 
-    private static boolean assembleNotNull(Element element) {
-        com.memtrip.sqlking.common.Column column = element.getAnnotation(com.memtrip.sqlking.common.Column.class);
-        return column.not_null();
+        NotNull notNull = null;
+
+        if (column.notNull() != null)
+            {
+            notNull = new NotNull();
+
+            notNull.setOnConflict(notNullAnnotation.onConflict());
+            }
+
+        return notNull;
     }
 
     private static String assembleDefaultValue(Element element) {
@@ -85,13 +108,13 @@ class ParseColumnAnnotation {
     private static ForeignKey assembleForeignKey(Element element) {
         com.memtrip.sqlking.common.Column column = element.getAnnotation(com.memtrip.sqlking.common.Column.class);
         com.memtrip.sqlking.common.ForeignKey foreignKeyAnnotation = column.foreignKey();
-    
+
         ForeignKey foreignKey = new ForeignKey();
 
         foreignKey.setForeignTableName(foreignKeyAnnotation.foreignTableName());
-        
+
         List<String> localColumnNames = new ArrayList<>();
-    
+
         for (String columnName : foreignKeyAnnotation.localColumnNames())
             {
             localColumnNames.add(columnName);
@@ -120,7 +143,7 @@ class ParseColumnAnnotation {
             {
             Constraint constraint = new Constraint();
 
-            constraint.setConstraintName(constraintAnnotation.constraintName());
+            constraint.setConstraintName("");
             constraint.setConstraintExpression(constraintAnnotation.expression());
             constraint.setOnConflict(constraintAnnotation.onConflict());
 

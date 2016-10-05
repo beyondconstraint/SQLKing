@@ -24,6 +24,10 @@ public class AssembleCreateIndexesMethod implements TemplateMethodModelEx {
     private AssembleCreateIndexesMethod() {
     }
 
+    private String buildIndexName(Index index)
+        {
+        return index.getTableName().toLowerCase() + "_" + index.getIndexName().toLowerCase() + "_index";    // note: must match the syntax in resources/Q.Java
+        }
     /**
      * Build a list of create Index statement baseds on the provided tableName
      * @param	indexes	The list of indexes that will have create statements created for them
@@ -37,7 +41,7 @@ public class AssembleCreateIndexesMethod implements TemplateMethodModelEx {
 
         for (Index index : indexes)
             {
-            sb.append("CREATE INDEX " + index.getIndexName() + " ON " + index.getTableName() + " (");
+            sb.append("CREATE INDEX " + buildIndexName(index) + " ON " + index.getTableName() + " (");
 
             for (IndexColumn indexColumn : index.getColumns())
                 {
@@ -52,6 +56,9 @@ public class AssembleCreateIndexesMethod implements TemplateMethodModelEx {
             sb.append(");");
 
             }
+
+        System.out.println("++ " + sb.toString());
+
         return "\"" + sb.toString() + "\"";
         }
 

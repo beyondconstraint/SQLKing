@@ -20,6 +20,7 @@ package com.memtrip.sqlking.common;
  */
 public @interface Table {
     Index[] indexes() default {};
+    PrimaryKey primaryKey() default @PrimaryKey();
     ForeignKey[] foreignKeys() default {};
     Constraint[] constraints() default {};
     Trigger[] triggers() default {};
