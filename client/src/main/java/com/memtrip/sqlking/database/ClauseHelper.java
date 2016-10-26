@@ -56,7 +56,9 @@ public class ClauseHelper {
 
         if (clause != null) {
             for (Clause item : clause) {
-                clauseBuilder.append(getClause(item));
+                String strClause = getClause(item);
+//                clauseBuilder.append(getClause(item));
+                clauseBuilder.append(strClause);
             }
         }
         return clauseBuilder.toString();
@@ -255,7 +257,7 @@ public class ClauseHelper {
                 .append(" ")
                 .append(tableName);
 
-            if (tableAliasName.length() > 0)
+            if (tableAliasName != null && tableAliasName.length() > 0)
                 {
                 sb.append(" AS ")
                   .append(tableAliasName);
@@ -314,7 +316,7 @@ public class ClauseHelper {
 
         sb.append(" FROM ")
                 .append(tableName);
-                if (tableAlias.length() > 0)
+                if (tableAlias != null && tableAlias.length() > 0)
                     {
                     sb.append(" AS ")
                             .append(tableAlias);

@@ -79,14 +79,13 @@ public class AssembleCreateTableMethod implements TemplateMethodModelEx {
                         sb.append(" ON CONFLICT ")
                             .append (column.getPrimaryKey().getOnConflict().toString());
                         }
-
                     }
 
                 if (column.getNotNull() != null)
                     {
                     if (column.getNotNull().getOnConflict() != ConflictAction.NONE )
                         {
-                        sb.append(" NOT NULL");
+                        sb.append(" NOT NULL ");
                         sb.append(" ON CONFLICT ");
                         sb.append(column.getNotNull().getOnConflict().toString());
                         }
@@ -100,29 +99,30 @@ public class AssembleCreateTableMethod implements TemplateMethodModelEx {
                     {
                     ForeignKey foreignKey = column.getForeignKey();
 
-                    sb.append(" FOREIGN KEY ")
-                            .append(table.getName().toLowerCase() + "_" + foreignKey.getForeignTableName().toLowerCase() + "_" + column.getName().toLowerCase() + "_fk")
+                    sb.append(" FOREIGN KEY /* column */")
                             .append("(")
                             .append(foreignKey.getLocalColumnNames().get(0).replaceAll("\\[|\\]", ""))
                             .append(") REFERENCES ")
                             .append(column.getForeignKey().getForeignTableName())
-                            .append(" (")
+                            .append("(")
                             .append(column.getForeignKey().getForeignColumnNames().get(0).replaceAll("\\[|\\]", ""))
                             .append(")");
                     }
 
-                for (Constraint constraint : column.getConstraints())
+                if (column.getConstraints().size() > 0)
                     {
-                    if (constraint.getOnConflict() != ConflictAction.NONE)
+                    for (Constraint constraint : column.getConstraints())
                         {
-                        sb.append(" CONSTRAINT ")
-                                .append(constraint.getConstraintName())
-                                .append(" ")
-                                .append(constraint.getConstraintExpression());
+                        if (constraint.getOnConflict() != ConflictAction.NONE)
+                            {
+                            sb.append(constraint.getConstraintExpression());
 
-                        sb.append(" ON CONFLICT ")
-                                 .append(constraint.getOnConflict().toString());
+                            sb.append(" ON CONFLICT ")
+                                    .append(constraint.getOnConflict().toString());
+                            sb.append(",");
+                            }
                         }
+                    sb.deleteCharAt(sb.length() - 1);
                     }
                 sb.append(",");
                 }
@@ -154,24 +154,24 @@ public class AssembleCreateTableMethod implements TemplateMethodModelEx {
 
         for (ForeignKey foreignKey : table.getForeignKeys())
             {
-            if (tableConstraintCount > 0)
-                {
-                sb.append(", ");
-                }
+//            if (tableConstraintCount > 0)
+//                {
+//                sb.append(", ");
+//                }
 
             tableConstraintCount++;
 
-            sb.append(" FOREIGN KEY ")
-                    .append(table.getName().toLowerCase() + "_" + foreignKey.getForeignTableName().toLowerCase() + "_" + fkCount + "_fk")
-                    .append(" (")
+            sb.append(", FOREIGN KEY /* table */")
+                    .append("(")
                     .append(foreignKey.getLocalColumnNames().toString().replaceAll("\\[|\\]", ""))
                     .append(") REFERENCES ")
                     .append(foreignKey.getForeignTableName())
-                    .append(" (")
+                    .append("(")
                     .append(foreignKey.getForeignColumnNames().toString().replaceAll("\\[|\\]", ""))
                     .append(")");
             fkCount++;
             }
+
         sb.append(");");
 
         System.out.println("++ " + sb.toString());
