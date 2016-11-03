@@ -54,8 +54,8 @@ public class Q {
             }
 
             @Override
-            public String getTableInsertQuery() {
-                return ${assembleCreateTable(table, tables)}
+            public String getTableCreateQuery() {
+               return ${assembleCreateTable(table, tables)};
             }
 
             @Override
@@ -66,20 +66,29 @@ public class Q {
                         "${table.getName()}_${column.getName()}_index",
                     </#if>
                 </#list>
+                <#list table.getIndexes() as index>
+                        "${table.getName()?lower_case}_${index.getIndexName()?lower_case}_index",
+                </#list>
                 };
             }
 
             @Override
-            public String getCreateIndexQuery() {
-                StringBuilder sb = new StringBuilder();
-
-                <#list table.getMutableColumns(tables) as column>
-                    <#if column.isIndex()>
-                        sb.append("CREATE INDEX ${table.getName()}_${column.getName()}_index ON ${table.getName()} (${column.getName()});");
-                    </#if>
+            public String[] getTriggerNames() {
+                return new String[] {
+                <#list table.getTriggers() as triggers>
+                        "${table.getName()}_${triggers.getTriggerName()}",
                 </#list>
+                };
+            }
 
-                return (sb.length() > 0) ? sb.toString() : null;
+            @Override
+            public String getCreateIndexesQuery() {
+                return ${assembleCreateIndexes(table)};
+            }
+
+            @Override
+            public String getCreateTriggersQuery() {
+                return ${assembleCreateTriggers(table)};
             }
 
             @Override

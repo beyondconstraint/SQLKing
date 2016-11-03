@@ -3,7 +3,23 @@ package com.memtrip.sqlking.sample.model;
 import com.memtrip.sqlking.common.Column;
 import com.memtrip.sqlking.common.Table;
 
-@Table
+@Table(foreignKeys = {
+            foreignKey (foreignTableName = "User",
+                        localColumnNames = {"userId"},
+                        foreignColumnNames = {"id"}
+                       )
+
+        },
+        indexes = {
+            @Index(
+                    indexName = "user",
+                    columns = {
+                          @IndexColumn(column = "userId"),
+                          @IndexColumn(column = "timestamp", sortOrder = SortOrder.DESC)
+                    }
+            )
+        }
+)
 public class Comment {
     @Column(index = true) int id;
     @Column String body;
@@ -14,7 +30,6 @@ public class Comment {
     public int getId() {
         return id;
     }
-
     public void setId(int id) {
         this.id = id;
     }
@@ -22,7 +37,6 @@ public class Comment {
     public String getBody() {
         return body;
     }
-
     public void setBody(String body) {
         this.body = body;
     }
@@ -30,7 +44,6 @@ public class Comment {
     public long getTimestamp() {
         return timestamp;
     }
-
     public void setTimestamp(long timestamp) {
         this.timestamp = timestamp;
     }
@@ -38,7 +51,6 @@ public class Comment {
     public int getUserId() {
         return userId;
     }
-
     public void setUserId(int userId) {
         this.userId = userId;
     }
@@ -46,7 +58,6 @@ public class Comment {
     public User getUser() {
         return user;
     }
-
     public void setUser(User user) {
         this.user = user;
     }

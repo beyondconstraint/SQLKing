@@ -22,6 +22,7 @@ import com.memtrip.sqlking.operation.clause.Clause;
  */
 public abstract class Join<J> {
     private Class<J> mTable;
+    private String mTableAlias;
     private Join mJoin;
     private Clause[] mClauses;
 
@@ -37,8 +38,28 @@ public abstract class Join<J> {
         return mClauses;
     }
 
+    public String getTableAliasName() { return mTableAlias; }
+
+    public Join(Class<J> table, Clause... clauses) {
+        mTable = table;
+        mClauses = clauses;
+    }
+
     public Join(Class<J> table, Join join, Clause... clauses) {
         mTable = table;
+        mJoin = join;
+        mClauses = clauses;
+    }
+
+    public Join(Class<J> table, String tableAlias, Clause... clauses) {
+        mTable = table;
+        mTableAlias = tableAlias;
+        mClauses = clauses;
+    }
+
+    public Join(Class<J> table, String tableAlias, Join join, Clause... clauses) {
+        mTable = table;
+        mTableAlias = tableAlias;
         mJoin = join;
         mClauses = clauses;
     }

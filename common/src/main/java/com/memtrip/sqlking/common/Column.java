@@ -17,9 +17,19 @@ package com.memtrip.sqlking.common;
 
 /**
  * @author Samuel Kirton [sam@memtrip.com]
+ * @author Adrian Velcich [adrian@higration.co.za]
  */
+
 public @interface Column {
-    boolean primary_key() default false;
-    boolean auto_increment() default false;
-    boolean index() default false;
+    boolean isIndex() default false;
+
+    PrimaryKey primaryKey() default @PrimaryKey(); // sortOrder = SortOrder.ASC, onConflict = ConflictAction.ROLLBACK);
+
+    NotNull notNull() default @NotNull(onConflict = ConflictAction.NONE);
+    boolean isUnique() default false;
+    Check check() default @Check();
+    String defaultValue() default "";
+    ForeignKey foreignKey() default @ForeignKey(); // Only one column recognised if this is a column constraint
+    Constraint[] constraints() default {};
+
 }

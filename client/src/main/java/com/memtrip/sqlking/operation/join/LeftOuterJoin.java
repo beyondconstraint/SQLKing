@@ -23,15 +23,35 @@ import com.memtrip.sqlking.operation.clause.Clause;
 @SuppressWarnings("unchecked")
 public class LeftOuterJoin<J> extends Join {
 
+    public LeftOuterJoin (Class<J> table, Clause... clauses) {
+    super(table, clauses);
+    }
+    
     public LeftOuterJoin(Class<J> table, Join join, Clause... clauses) {
-        super(table, join, clauses);
+    super(table, join, clauses);
     }
-
+    
+    public LeftOuterJoin(Class<J> table, String tableAlias, Clause... clauses) {
+    super(table, tableAlias, clauses);
+    }
+    
+    public LeftOuterJoin(Class<J> table, String tableAlias, Join join, Clause... clauses) {
+    super(table, tableAlias, join, clauses);
+    }
+    
     public static LeftOuterJoin leftOuterJoin(Class<?> table, Clause... clauses) {
-        return new LeftOuterJoin(table, null, clauses);
+    return new LeftOuterJoin(table, clauses);
     }
-
+    
     public static LeftOuterJoin leftOuterJoin(Class<?> table, Join join, Clause... clauses) {
-        return new LeftOuterJoin(table, join, clauses);
+    return new LeftOuterJoin(table, clauses);
+    }
+    
+    public static LeftOuterJoin leftOuterJoin(Class<?> table, String tableAlias, Clause... clauses) {
+    return new LeftOuterJoin(table, tableAlias, clauses);
+    }
+    
+    public static LeftOuterJoin leftOuterJoin(Class<?> table, String tableAlias, Join join, Clause... clauses) {
+    return new LeftOuterJoin(table, tableAlias, join, clauses);
     }
 }

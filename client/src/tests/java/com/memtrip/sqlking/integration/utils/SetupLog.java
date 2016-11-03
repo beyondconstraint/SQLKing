@@ -26,7 +26,7 @@ public class SetupLog {
         };
 
         Insert.getBuilder()
-                .values(logs)
+                .values((Object[]) logs)
                 .execute(sqlProvider);
     }
 

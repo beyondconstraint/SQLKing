@@ -39,18 +39,29 @@ public class SQLInit {
 
         String[] schemaArray = new String[modelCount];
         String[] tableNameArray = new String[modelCount];
+
         String[] createIndexArray = new String[modelCount];
         List<String> indexNameArray = new ArrayList<>();
 
+        String[] createTriggerArray = new String[modelCount];;
+        List<String> triggerNameArray = new ArrayList<>();
+
         for (int i = 0; i < modelClassDef.length; i++) {
             SQLQuery sqlQuery = resolver.getSQLQuery(modelClassDef[i]);
-            schemaArray[i] = sqlQuery.getTableInsertQuery();
+
+            schemaArray[i] = sqlQuery.getTableCreateQuery();
             tableNameArray[i] = sqlQuery.getTableName();
-            createIndexArray[i] = sqlQuery.getCreateIndexQuery();
+            createIndexArray[i] = sqlQuery.getCreateIndexesQuery();
+            createTriggerArray[i] = sqlQuery.getCreateTriggersQuery();
 
             for (String indexName : sqlQuery.getIndexNames()) {
                 indexNameArray.add(indexName);
             }
+
+            for (String triggerName : sqlQuery.getTriggerNames()) {
+                triggerNameArray.add(triggerName);
+            }
+
         }
 
         SQLOpen sqlOpen = new SQLOpen(
@@ -60,6 +71,8 @@ public class SQLInit {
                 tableNameArray,
                 createIndexArray,
                 indexNameArray,
+                createTriggerArray,
+                triggerNameArray,
                 context
         );
 

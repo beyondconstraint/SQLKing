@@ -1,31 +1,54 @@
 package com.memtrip.sqlking.preprocessor.processor.data;
 
-public class ForeignKey {
-    private String mTable;
-    private String mThisColumn;
-    private String mForeignColumn;
+/**
+ * Author: A.Velcich
+ */
 
-    public String getTable() {
-        return mTable;
+import java.util.List;
+import com.memtrip.sqlking.common.RIRule;
+
+public class ForeignKey
+    {
+    private String       mForeignTableName;
+    private String       mForeignTableAliasName;
+    private List<String> mLocalColumnNames;
+    private List<String> mForeignColumnNames;
+    private RIRule       mRIUpdateRule;
+    private RIRule       mRIDeleteRule;
+
+    public String getForeignTableName() {
+        return mForeignTableName;
+    }
+    public void setForeignTableName(String newVal) {
+    mForeignTableName = newVal;
     }
 
-    public void setTable(String newVal) {
-        mTable = newVal;
+    public String getForeignTableAliasName () { return mForeignTableAliasName; }
+    public void setForeignTableAliasName (String newVal) { this.mForeignTableAliasName = newVal; }
+
+    public List<String> getLocalColumnNames () { return mLocalColumnNames; }
+    public void setLocalColumnNames(List<String> newVal) { mLocalColumnNames = newVal; }
+
+    public List<String> getForeignColumnNames() { return mForeignColumnNames; }
+    public void setForeignColumnNames(List<String> newVals) {
+        mForeignColumnNames = newVals;
     }
 
-    public String getThisColumn() {
-        return mThisColumn;
+    public RIRule getRIUpdateRule ()
+        {
+        return mRIUpdateRule;
+        }
+    public void setRIUpdateRule (RIRule newVal)
+        {
+        this.mRIUpdateRule = newVal;
     }
 
-    public void setLocalColumn(String newVal) {
-        mThisColumn = newVal;
+    public RIRule getRIDeleteRule ()
+        {
+        return mRIDeleteRule;
     }
-
-    public String getForeignColumn() {
-        return mForeignColumn;
-    }
-
-    public void setTargetColumn(String newVal) {
-        mForeignColumn = newVal;
+    public void setRIDeleteRule (RIRule newVal)
+        {
+        this.mRIDeleteRule = newVal;
     }
 }

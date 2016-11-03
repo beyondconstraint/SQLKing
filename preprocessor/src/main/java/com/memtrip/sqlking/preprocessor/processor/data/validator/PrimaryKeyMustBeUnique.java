@@ -5,6 +5,7 @@ import com.memtrip.sqlking.preprocessor.processor.ValidatorException;
 import com.memtrip.sqlking.preprocessor.processor.data.Column;
 import com.memtrip.sqlking.preprocessor.processor.data.Data;
 import com.memtrip.sqlking.preprocessor.processor.data.Table;
+import com.memtrip.sqlking.preprocessor.processor.data.PrimaryKey;
 
 import java.util.List;
 
@@ -16,12 +17,22 @@ public class PrimaryKeyMustBeUnique implements Validator {
         this.data = data;
     }
 
-    private boolean primaryKeyIsUniqueInColumns(List<Column> columns) {
+    private boolean primaryKeyIsUniqueInColumns(Table table) {
         int occurrences = 0;
 
-        if (columns != null) {
-            for (Column column : columns) {
-                if (column.hasPrimaryKey()) {
+        PrimaryKey primaryKey = table.getPrimaryKey();
+
+        if (primaryKey != null && primaryKey.getColumns().length > 0)
+            {
+            occurrences++;
+            }
+
+        if (table.getColumns() != null) {
+            for (Column column : table.getColumns()) {
+
+                primaryKey = column.getPrimaryKey();
+
+                if (primaryKey != null && primaryKey.getColumns().length > 0 ) {
                     occurrences++;
                 }
             }
@@ -33,7 +44,7 @@ public class PrimaryKeyMustBeUnique implements Validator {
     @Override
     public void validate() throws ValidatorException {
         for (Table table : data.getTables()) {
-            if (primaryKeyIsUniqueInColumns(table.getColumns())) {
+            if (primaryKeyIsUniqueInColumns(table)) {
                 throw new ValidatorException(
                         table.getElement(),
                         "[Duplicate primary_key's found in @Table: `" + table.getName()

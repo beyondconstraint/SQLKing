@@ -1,8 +1,16 @@
 package com.memtrip.sqlking.preprocessor.processor.freemarker.method;
 
+import com.memtrip.sqlking.common.ConflictAction;
+
 import com.memtrip.sqlking.preprocessor.processor.data.Column;
 import com.memtrip.sqlking.preprocessor.processor.data.ForeignKey;
+import com.memtrip.sqlking.preprocessor.processor.data.PrimaryKey;
+import com.memtrip.sqlking.preprocessor.processor.data.IndexColumn;
+import com.memtrip.sqlking.preprocessor.processor.data.Index;
 import com.memtrip.sqlking.preprocessor.processor.data.Table;
+import com.memtrip.sqlking.preprocessor.processor.data.Constraint;
+import com.memtrip.sqlking.preprocessor.processor.data.Trigger;
+
 import freemarker.ext.beans.StringModel;
 import freemarker.template.TemplateMethodModelEx;
 import freemarker.template.TemplateModelException;
@@ -24,59 +32,152 @@ public class AssembleCreateTableMethod implements TemplateMethodModelEx {
     public static Map<String, Object> getMethodMap() {
         Map<String, Object> map = new HashMap<>();
         map.put(ASSEMBLE_CREATE_TABLE, new AssembleCreateTableMethod());
+
         return map;
     }
 
     private AssembleCreateTableMethod() {
-
     }
 
     /**
      * Build a create table statement based on the provided tableName and members
      * @param	table	The table that the statement will create
-     * @return	A SQL statement that will create a table
+     * @return	A SQL statement that will create a table, and any defined Indexes and Foreign Keys
      */
-    private String buildCreateTableStatement(Table table, List<Table> tables) {
-        StringBuilder statementBuilder = new StringBuilder();
+    private String buildCreateTableStatement(Table table, List<Table> tables)
+        {
+        StringBuilder sb = new StringBuilder();
+        int tableConstraintCount = 0;
 
-        statementBuilder.append("CREATE TABLE ");
-        statementBuilder.append(table.getName());
-        statementBuilder.append(" (");
+        sb.append("CREATE TABLE ");
+        sb.append(table.getName());
+        sb.append(" (");
 
-        for (int i = 0; i < table.getColumns().size(); i++) {
+//......Columns and column contraints
+
+        for (int i = 0; i < table.getColumns().size(); i++)
+            {
             Column column = table.getColumns().get(i);
 
-            if (!column.isJoinable(tables)) {
-                statementBuilder.append(column.getName());
-                statementBuilder.append(" ");
-                statementBuilder.append(getSQLDataTypeFromClassRef(column.getType()));
+            if (!column.isJoinable(tables))
+                {
+                sb.append(column.getName())
+                    .append(" ")
+                    .append(getSQLDataTypeFromClassRef(column.getType()));
 
-                if (column.hasPrimaryKey()) {
-                    statementBuilder.append(" PRIMARY KEY");
-                    if (column.hasAutoIncrement()) {
-                        statementBuilder.append(" AUTOINCREMENT");
+                if (column.getPrimaryKey() != null && column.getPrimaryKey().isActive() == true)
+                    {
+                    sb.append(" PRIMARY KEY");
+
+                    if (column.getPrimaryKey().isAutoNumber())
+                        {
+                        sb.append(" AUTOINCREMENT");
+                        }
+
+                    if (column.getPrimaryKey().getOnConflict() != ConflictAction.NONE)
+                        {
+                        sb.append(" ON CONFLICT ")
+                            .append (column.getPrimaryKey().getOnConflict().toString());
+                        }
                     }
+
+                if (column.getNotNull() != null)
+                    {
+                    if (column.getNotNull().getOnConflict() != ConflictAction.NONE )
+                        {
+                        sb.append(" NOT NULL ");
+                        sb.append(" ON CONFLICT ");
+                        sb.append(column.getNotNull().getOnConflict().toString());
+                        }
+                    }
+                else if (column.getDefaultValue().length() > 0 )
+                    {
+                    sb.append(" DEFAULT ")
+                      .append(column.getDefaultValue());
+                    }
+                else if (column.getForeignKey().getForeignTableName().length() > 0)
+                    {
+                    ForeignKey foreignKey = column.getForeignKey();
+
+                    sb.append(" FOREIGN KEY /* column */")
+                            .append("(")
+                            .append(foreignKey.getLocalColumnNames().get(0).replaceAll("\\[|\\]", ""))
+                            .append(") REFERENCES ")
+                            .append(column.getForeignKey().getForeignTableName())
+                            .append("(")
+                            .append(column.getForeignKey().getForeignColumnNames().get(0).replaceAll("\\[|\\]", ""))
+                            .append(")");
+                    }
+
+                if (column.getConstraints().size() > 0)
+                    {
+                    for (Constraint constraint : column.getConstraints())
+                        {
+                        if (constraint.getOnConflict() != ConflictAction.NONE)
+                            {
+                            sb.append(constraint.getConstraintExpression());
+
+                            sb.append(" ON CONFLICT ")
+                                    .append(constraint.getOnConflict().toString());
+                            sb.append(",");
+                            }
+                        }
+                    sb.deleteCharAt(sb.length() - 1);
+                    }
+                sb.append(",");
                 }
-
-                statementBuilder.append(",");
             }
-        }
 
-        for (ForeignKey foreignKey : table.getForeignKeys()) {
-            statementBuilder.append("FOREIGN KEY(")
-                    .append(foreignKey.getThisColumn()).append(") REFERENCES ")
-                    .append(foreignKey.getTable())
+        sb.deleteCharAt(sb.length() - 1);
+
+//......Table constraints and triggers
+
+        PrimaryKey primaryKey = table.getPrimaryKey();
+
+        if (primaryKey != null && primaryKey.isActive() == true)
+            {
+            tableConstraintCount++;
+
+            sb.append (" PRIMARY KEY")
                     .append("(")
-                    .append(foreignKey.getForeignColumn())
-                    .append("),");
+                    .append(primaryKey.getColumns())
+                    .append(")");
+
+            if (primaryKey.getOnConflict() != ConflictAction.NONE)
+                {
+                sb.append(" ON CONFLICT ")
+                        .append(primaryKey.getOnConflict().toString());
+                }
+            }
+
+        int fkCount = 1;
+
+        for (ForeignKey foreignKey : table.getForeignKeys())
+            {
+//            if (tableConstraintCount > 0)
+//                {
+//                sb.append(", ");
+//                }
+
+            tableConstraintCount++;
+
+            sb.append(", FOREIGN KEY /* table */")
+                    .append("(")
+                    .append(foreignKey.getLocalColumnNames().toString().replaceAll("\\[|\\]", ""))
+                    .append(") REFERENCES ")
+                    .append(foreignKey.getForeignTableName())
+                    .append("(")
+                    .append(foreignKey.getForeignColumnNames().toString().replaceAll("\\[|\\]", ""))
+                    .append(")");
+            fkCount++;
+            }
+
+        sb.append(");");
+
+        System.out.println("++ " + sb.toString());
+
+        return "\"" + sb.toString() + "\"";
         }
-
-        statementBuilder.deleteCharAt(statementBuilder.length()-1);
-
-        statementBuilder.append(");");
-
-        return "\"" + statementBuilder.toString() + "\";";
-    }
 
     /**
      * Determine the data type of the provided class reference and return

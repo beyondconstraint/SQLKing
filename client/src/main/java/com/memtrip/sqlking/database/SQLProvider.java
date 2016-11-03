@@ -67,7 +67,7 @@ public class SQLProvider {
         );
     }
 
-    protected Cursor query(String tableName, String[] columns, Clause[] clause, Join[] joins,
+    protected Cursor query(String tableName, String TableAliasName, String[] columns, Clause[] clause, Join[] joins,
                            String groupBy, String having, OrderBy orderBy, Limit limit) {
 
         if (joins != null && joins.length > 0) {
@@ -76,6 +76,7 @@ public class SQLProvider {
                         columns,
                         joins,
                         tableName,
+                        TableAliasName,
                         clause,
                         orderBy,
                         limit,

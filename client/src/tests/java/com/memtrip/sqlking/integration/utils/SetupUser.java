@@ -97,7 +97,7 @@ public class SetupUser {
         };
 
         Insert.getBuilder()
-            .values(users)
+            .values((Object[]) users)
             .execute(sqlProvider);
     }
 

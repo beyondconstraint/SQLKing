@@ -8,8 +8,8 @@ annotations and CRUD classes expose an expressive api for executing SQLite queri
 preprocessors on Android.*
 ```groovy
 dependencies {
-    apt 'com.memtrip.sqlking:preprocessor:1.1.5'
-    compile 'com.memtrip.sqlking:client:1.1.5'
+    apt 'com.memtrip.sqlking:preprocessor:1.1.6'
+    compile 'com.memtrip.sqlking:client:1.1.6'
 }
 ```
 
@@ -230,12 +230,27 @@ User[] users = Select.getBuilder()
 ####Joins####
 Joins can be performed using the `InnerJoin`, `LeftOutJoin`, `CrossInnerJoin`, `NaturalInnerJoin`, `NaturalLeftOuterJoin` classes.
 The target table for the join must be defined as an @Column, the object will be populated with any join results.
+Single Column Constraints and Foreignk Keys can also be defined.
 
 ```java
 @Table
 public class Comment {
     @Column(index = true) int id;
-    @Column int userId;
+    @Column([@ForeignKey                    // Single column ForeignKey (not required for joins, but will be enforced by SQLite DBMS)
+                (
+                foreignTablename="User", 
+                localColumnNames ={"user_id"}, 
+                foreignColumnNames = {"id"}, 
+                [update/deleteRule=RIRule.Cascade|...][,...]
+                )  
+            int userId;] 
+            @Constraints = {@Constraint     // Single column Constraints, see SQLite documentation fot `table_constraint`
+                    (
+                    constraintName = "constraintName",                          // will be created as "table_name_constraint_name_constraint". the constraint name must be unique within the constraints for the table
+                    expression = "some expression eg, PRIMARY|FOREIGN KEY, UNIQUE, CHECK"  
+                    [,@onConflict (ConflictAction.ROLLBACK|ABORT|FAIL|etc)]     // optional ON CONFLICT clause, if required and appropriate           
+                    )[, ...]                                                    // optional additional @Constraint statements
+
     @Column User user; // The target table for a potential join
 
     public int getId() {
@@ -265,7 +280,7 @@ public class Comment {
 
 @Table
 public class User {
-    @Column(index = true) int id;
+    @Column(index = true) int id;       // Single column index (short form syntax)
     
     public int getId() {
         return id;
@@ -282,13 +297,18 @@ Comment[] comments = Select.getBuilder()
         
 User user = comments[0].getUser(); // The nested User object is populated by the join
 ```
-####Primary Key####
-An auto incrementing primary key can be defined using:
+
+####Primary Keys####
+Primary Keys can be defined at Table-level or Column-level, but not both, and only one Primary can be defined per table;
+a Primary Key at Table-level can contain multiple columns in the key, but Column-level Primary Keys are only defined for the single column on which it is annotated.
+
+An auto incrementing primary key can be defined on an `int` or `long` column using:
 
 ```java
 @Table
 public class Data {
-    @Column(primary_key = true, auto_increment = true) int id;
+    @Column(primary_key = @PrimaryKey(active = true, true, auto_increment = true) 
+    int id;
 
     public int getId() {
         return id;
@@ -300,6 +320,95 @@ public class Data {
 }
 ```
 
+Table level Primary keys are annotated with the following syntax:
+
+```java
+@Table(
+        primaryKey = @PrimaryKey(
+                active = true,
+                columns = {"id"},       // Note, multiple columns can be defined, but in this case, no auto-increment is allowed
+                auto_increment = true
+        )
+)
+public class Post {
+    @Column int id;
+    @Column String title;
+    @Column byte[] blob;
+    @Column long timestamp;
+    @Column User user;
+    @Column Data data;
+
+```
+
+####Table Constraints, Composite Indexes and Foreign Keys####
+Multiple table Constraints, Composite Indexes and Composite Foreign Keys can be defined for the table with the
+
+```java
+@Table (
+    foreignkeys = {@ForeignKey (                                    // not required for joins (yet), but will be enforced by SQLite RDDBMS)        
+                        foreignTableName = "xxxx",                  // will be created as "fk_localTableName_foreignTableName_n", _n increments for multiple links to the same foreign table
+                        localColumnNames = {"localcolumn"[, ...]},  // Multiple columns possible
+                        },
+                        foreignColumnNames = {"foreignColumn"[, ...]// Multiple columns possible
+                        [,updateRule = <RIRule.SetNull
+                                             |RIRule.SetDefault
+                                             |RIRule.Cascade        // The default
+                                             |RIRule.Restrict
+                                             |RIRule.NotNull
+                                             |RIRule.NoAction>]
+                        [,deleteRule = <RIRule.SetNull
+                                             |RIRule.SetDefault
+                                             |RIRule.Cascade        
+                                             |RIRule.Restrict       // The default
+                                             |RIRule.NotNull
+                                             |RIRule.NoAction>]
+
+                        }
+                   )[, ...]                                         // optional additional @ForeignKey statements     
+    },
+    indexes = {@Index (
+                    indexName = "index_name",                       // will be created as "table_name_index_name_index". index_name must be unique within the indexes on the parent table
+                    columns = {@IndexColumn (
+                                    column = "column1"
+                                       [,sortOrder = SortOrder.ASC|SortOrder.DESC]    // optional column sort order (default is SortOrder.ASC)
+                               )[, ...]                             // optional additional @IndexColumn statements
+                    }
+               )[, ...]                                             // optional additional @Index statements
+     },
+    constraints = {@Constraint (
+                    constraintName = "constraintName",          // will be created as "table_name_constraint_name_constraint". the constraint name must be unique within the constraints for the table
+                    expression = "some expression eg, PRIMARY|FOREIGN KEY, UNIQUE, CHECK" // see SQLite documentation fot `table_constraint` clause
+                    [,@onConflict (ConflictAction.ROLLBACK|ABORT|FAIL|IGNORE|REPLACE)]    // as appropriate, if required           
+                    )[, ...]                                        // optional additional @Constraint statements
+     }                    
+)
+```
+
+####Triggers####
+Triggers can be defined at the Table Level with the following syntax:
+
+```java
+@Table (
+        triggers = {@Trigger(triggerName = "my_trigger_name",
+                            [,triggerTime = <TriggerTime.BEFORE         // optional; only one trigger time is allowed, but it is not required (default is TriggerTime.NONE)
+                                            | TriggerTime.AFTER 
+                                            | TriggerTime.INSTEAD_OF 
+                                            | TriggerTime.NONE>]          
+                            [,triggerType = <TriggerType.INSERT         // optional; only one trigger type is allowed, but is not required (default is triggerType.NONE)
+                                            | TriggerType.UPDATE 
+                                            | TriggerType.DELETE 
+                                            | TriggerType.NONE>]      
+                            [,updateOfColumns = { <column>[,...] }]     // one or more columns  
+                            [,forEachRow = <true|false>]                // optional; defaults to false. SQLite does not currently support FOR_EACH_STATEMENT
+                            [,whenExpression = <"my_when_expression">]  // optional; see SQLite document for the 'my_when_expression' syntax   
+                            <,statement = "my_trigger_statement">         // see SQLite document for the 'my_trigger_expression' syntax  
+                    )[,...]                                             // optional addition @Trigger statements  
+        }
+)        
+
+```
+
+
 ####Tests####
 The `tests/java/com/memtrip/sqlking` package contains a full set of unit and integration tests. The
 tests can be used as a good reference on how to structure queries.
@@ -307,6 +416,8 @@ tests can be used as a good reference on how to structure queries.
 ####TODO####
 - Validate that object relationships defined by @Column are annotated with @Table
 - Validate that auto_increment columns must be int or long
-- @Table annotation should support foreign_key functionality
 - @NotNull annotation and handle this validation in the software layer
-- Composite Foreign Key Constraints
+- Add table Alias support for Queries, Foreign keys and Joins
+- Allow for join creation based on Foreign key Annotations (including aliases)
+- Add support for database version upgrades scripts, so that exisiting data is retained during an upgrade 
+- Add validation and tests for triggers and constraints 

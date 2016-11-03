@@ -2,15 +2,22 @@ package com.memtrip.sqlking.integration.models;
 
 import com.memtrip.sqlking.common.Column;
 import com.memtrip.sqlking.common.ForeignKey;
+import com.memtrip.sqlking.common.Index;
+import com.memtrip.sqlking.common.IndexColumn;
 import com.memtrip.sqlking.common.Table;
 
 @Table(
         foreignKeys = {
-                @ForeignKey(
-                        targetTable = "Log",
-                        targetColumn = "id",
-                        localColumn = "logId"
-                )
+              @ForeignKey(
+                      foreignTableName = "Log",
+                      localColumnNames = {"logId"},
+                      foreignColumnNames = {"id"}
+              )
+        },
+        indexes = {
+              @Index(indexName = "username",
+                      columns = { @IndexColumn(column = "username") }
+              )
         }
 )
 public class User  {
@@ -27,7 +34,6 @@ public class User  {
     public int getId() {
         return id;
     }
-
     public void setId(int id) {
         this.id = id;
     }
@@ -35,7 +41,6 @@ public class User  {
     public String getUsername() {
         return username;
     }
-
     public void setUsername(String newVal) {
         username = newVal;
     }
@@ -43,7 +48,6 @@ public class User  {
     public long getTimestamp() {
         return timestamp;
     }
-
     public void setTimestamp(long newVal) {
         timestamp = newVal;
     }
@@ -51,7 +55,6 @@ public class User  {
     public boolean getIsRegistered() {
         return isRegistered;
     }
-
     public void setIsRegistered(boolean newVal) {
         isRegistered = newVal;
     }
@@ -59,7 +62,6 @@ public class User  {
     public byte[] getProfilePicture() {
         return profilePicture;
     }
-
     public void setProfilePicture(byte[] newVal) {
         profilePicture = newVal;
     }
@@ -67,7 +69,6 @@ public class User  {
     public double getRating() {
         return rating;
     }
-
     public void setRating(double rating) {
         this.rating = rating;
     }
@@ -75,7 +76,6 @@ public class User  {
     public int getCount() {
         return count;
     }
-
     public void setCount(int count) {
         this.count = count;
     }
@@ -83,7 +83,6 @@ public class User  {
     public int getLogId() {
         return logId;
     }
-
     public void setLogId(int logId) {
         this.logId = logId;
     }
@@ -91,7 +90,6 @@ public class User  {
     public Log getLog() {
         return log;
     }
-
     public void setLog(Log log) {
         this.log = log;
     }

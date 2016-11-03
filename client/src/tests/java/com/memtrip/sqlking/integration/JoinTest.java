@@ -54,19 +54,30 @@ public class JoinTest extends IntegrationTest {
 
     @Test
     public void testInnerJoin() {
-        User[] users = Select .getBuilder()
-                .join(innerJoin(Log.class, on("User.logId", "Log.id")))
+        User[] users = Select.getBuilder()
+                .join(innerJoin(Log.class, "L", on("User.logId", "L.id")))
                 .execute(User.class, getSQLProvider());
 
 
-        assertEquals(1, users.length);
-        assertEquals(SetupLog.LOG_1_ID, users[0].getLog().getId());
-        assertEquals(SetupLog.LOG_1_TIMESTAMP, users[0].getLog().getTimestamp());
+    assertEquals(1, users.length);
+    assertEquals(SetupLog.LOG_1_ID, users[0].getLog().getId());
+    assertEquals(SetupLog.LOG_1_TIMESTAMP, users[0].getLog().getTimestamp());
     }
+//    @Test
+//    public void testInnerJoin() {
+//    User[] users = Select.getBuilder()
+//                           .join.JoinBuilder((innerJoin(Log.class, on("User.logId", "Log.id")))
+//                                                     .execute(User.class, getSQLProvider());
+//
+//
+//    assertEquals(1, users.length);
+//    assertEquals(SetupLog.LOG_1_ID, users[0].getLog().getId());
+//    assertEquals(SetupLog.LOG_1_TIMESTAMP, users[0].getLog().getTimestamp());
+//    }
 
     @Test
     public void testNestedInnerJoin() {
-        Post[] posts = Select .getBuilder()
+        Post[] posts = Select.getBuilder()
                 .join(
                         innerJoin(
                             User.class,
@@ -105,7 +116,7 @@ public class JoinTest extends IntegrationTest {
 
     @Test
     public void testJoinWithLimit() {
-        Post[] posts = Select .getBuilder()
+        Post[] posts = Select.getBuilder()
                 .join(
                         innerJoin(
                                 User.class,
@@ -142,7 +153,7 @@ public class JoinTest extends IntegrationTest {
 
     @Test
     public void testJoinWithCondition() {
-        User[] users = Select .getBuilder()
+        User[] users = Select.getBuilder()
                 .join(innerJoin(Log.class, on("User.logId", "Log.id")))
                 .where(where(Q.User.USERNAME, Where.Exp.EQUAL_TO, SetupUser.ANGIE_USER_NAME))
                 .execute(User.class, getSQLProvider());

@@ -7,9 +7,9 @@ import com.memtrip.sqlking.common.Table;
 @Table(
         foreignKeys = {
                 @ForeignKey(
-                        targetTable = "User",
-                        targetColumn = "id",
-                        localColumn = "userId"
+                        foreignTableName = "User",
+                        localColumnNames = {"id"},
+                        foreignColumnNames = {"userId"}
                 )
         }
 )
@@ -25,7 +25,6 @@ public class Post {
     public int getId() {
         return id;
     }
-
     public void setId(int newVal) {
         id = newVal;
     }
@@ -33,7 +32,6 @@ public class Post {
     public String getTitle() {
         return title;
     }
-
     public void setTitle(String newVal) {
         title = newVal;
     }
@@ -41,7 +39,6 @@ public class Post {
     public String getBody() {
         return body;
     }
-
     public void setBody(String body) {
         this.body = body;
     }
@@ -49,7 +46,6 @@ public class Post {
     public long getTimestamp() {
         return timestamp;
     }
-
     public void setTimestamp(long newVal) {
         timestamp = newVal;
     }
@@ -57,7 +53,6 @@ public class Post {
     public int getUserId() {
         return userId;
     }
-
     public void setUserId(int userId) {
         this.userId = userId;
     }
@@ -65,7 +60,6 @@ public class Post {
     public User getUser() {
         return user;
     }
-
     public void setUser(User user) {
         this.user = user;
     }
@@ -73,7 +67,6 @@ public class Post {
     public Data getData() {
         return data;
     }
-
     public void setData(Data data) {
         this.data = data;
     }

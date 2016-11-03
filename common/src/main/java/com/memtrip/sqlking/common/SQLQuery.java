@@ -20,15 +20,25 @@ import android.database.Cursor;
 
 /**
  * @author Samuel Kirton [sam@memtrip.com]
+ * @author Adrian Velcich [adrian@higration.co.za]
  */
+
 @SuppressWarnings("WeakerAccess")
 public interface SQLQuery {
     String getTableName();
-    String getTableInsertQuery();
-    String[] getIndexNames();
-    String getCreateIndexQuery();
-    String[] buildUnionInsertQuery(Object[] models);
+    String getTableCreateQuery ();
+
     String[] getColumnNames();
+
+    String getCreateIndexesQuery();
+    String[] getIndexNames();
+
+    String getCreateTriggersQuery();
+    String[] getTriggerNames();
+
+    String[] buildUnionInsertQuery(Object[] models);
+
     ContentValues getContentValues(Object model);
+
     <T> T[] retrieveSQLSelectResults(Cursor cursor);
 }

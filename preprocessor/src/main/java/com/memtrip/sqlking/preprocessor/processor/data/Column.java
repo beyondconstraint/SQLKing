@@ -2,18 +2,22 @@ package com.memtrip.sqlking.preprocessor.processor.data;
 
 import java.util.List;
 
+
 public class Column {
-    private String mName;
-    private String mClassName;
-    private String mType;
+    private String  mName;
+    private String  mClassName;
+    private String  mType;
+    private PrimaryKey mPrimaryKey;
+    private ForeignKey mForeignKey;
     private boolean mIsIndex;
-    private boolean mPrimaryKey;
-    private boolean mHasAutoIncrement;
+    private NotNull mNotNull;
+    private boolean mUnique;
+    private String  mDefaultValue;
+    private List<Constraint>  mConstraints;
 
     public String getName() {
         return mName;
     }
-
     public void setName(String newVal) {
         mName = newVal;
     }
@@ -21,7 +25,6 @@ public class Column {
     public String getClassName() {
         return mClassName;
     }
-
     public void setClassName(String newVal) {
         mClassName = newVal;
     }
@@ -29,39 +32,48 @@ public class Column {
     public String getType() {
         return mType;
     }
-
     public void setType(String newVal) {
         mType = newVal;
     }
 
-    /**
-     * (Used in Q.java freemarker template)
-     */
+    public PrimaryKey getPrimaryKey() { return mPrimaryKey; }
+    public void setPrimaryKey(PrimaryKey newVal) { mPrimaryKey = newVal; }
+
     public boolean isIndex() {
         return mIsIndex;
     }
-
     public void setIsIndex(boolean newVal) {
         mIsIndex = newVal;
     }
 
-    public boolean hasPrimaryKey() {
-        return mPrimaryKey;
-    }
+    public NotNull getNotNull ()
+        {
+        return mNotNull;
+        }
+    public void setNotNull (NotNull newVal)
+        {
+        this.mNotNull = newVal;
+        }
 
-    public void setHasPrimaryKey(boolean newVal) {
-        mPrimaryKey = newVal;
-    }
+    public boolean isUnique () { return mUnique; }
+    public void setUnique (boolean mUnique) { this.mUnique = mUnique; }
 
-    public boolean hasAutoIncrement() {
-        return mHasAutoIncrement;
-    }
+    public String getDefaultValue ()
+        {
+        return mDefaultValue;
+        }
+    public void setDefaultValue (String newVal)
+        {
+        this.mDefaultValue = newVal;
+        }
 
-    public void setHasAutoIncrement(boolean newVal) {
-        mHasAutoIncrement = newVal;
-    }
+    public ForeignKey getForeignKey () { return mForeignKey; }
+    public void setForeignKey (ForeignKey newVal) { this.mForeignKey = newVal; }
 
-    public Table getRootTable(List<Table> tables) {
+    public List<Constraint> getConstraints () { return mConstraints; }
+    public void setConstraints (List<Constraint> newVal) { this.mConstraints = newVal; }
+
+    public Table getRootTable (List<Table> tables) {
         if (isJoinable(tables)) {
             for (Table table : tables) {
                 if (table.getType().equals(mType)) {

@@ -23,30 +23,39 @@ import java.util.List;
 
 /**
  * @author Samuel Kirton [sam@memtrip.com]
+ * @author Adrian Velcich [adrian@higration.co.za]
+ *
  */
 public class SQLOpen extends SQLiteOpenHelper {
 	private SQLiteDatabase mDatabase;
 	private String[] mSchemaArray;
 	private String[] mTableNameArray;
-    private String[] mCreateIndexQuery;
-    private List<String> mIndexNames;
-	
+	private String[] mCreateIndexStatements;
+	private List<String> mIndexNames;
+	private String[] mCreateTriggerStatements;
+	private List<String> mTriggerNames;
+
 	protected SQLiteDatabase getDatabase() {
 	    return mDatabase;
 	}
 	
 	protected SQLOpen(String name, int version, String[] schemaArray,
 					  String[] tableNameArray,
-					  String[] indexQuery,
+					  String[] createIndexStatements,
 					  List<String> indexNames,
+					  String[] createTriggerStatements,
+					  List<String> triggerNames,
 					  Context context) {
 
 		super(context, name, null, version);
 
 		mSchemaArray = schemaArray;
 		mTableNameArray = tableNameArray;
-        mCreateIndexQuery = indexQuery;
-        mIndexNames = indexNames;
+        mCreateIndexStatements = createIndexStatements;
+		mIndexNames = indexNames;
+		mCreateTriggerStatements = createTriggerStatements;
+		mTriggerNames = triggerNames;
+
 		mDatabase = getWritableDatabase();
 	}
 	
@@ -57,11 +66,17 @@ public class SQLOpen extends SQLiteOpenHelper {
 			db.execSQL(schema);
 		}
 
-        for (String createIndex : mCreateIndexQuery) {
-            if (createIndex != null) {
-                db.execSQL(createIndex);
-            }
-        }
+		for (String createIndex : mCreateIndexStatements) {
+			if (createIndex != null && createIndex.length() > 0) {
+				db.execSQL(createIndex);
+			}
+		}
+
+		for (String createTrigger : mCreateTriggerStatements) {
+			if (createTrigger != null && createTrigger.length() > 0) {
+				db.execSQL(createTrigger);
+			}
+		}
     }
 
 	@Override

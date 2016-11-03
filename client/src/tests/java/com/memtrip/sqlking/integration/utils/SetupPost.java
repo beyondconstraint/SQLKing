@@ -56,7 +56,7 @@ public class SetupPost {
         };
 
         Insert.getBuilder()
-                .values(posts)
+                .values((Object[]) posts)
                 .execute(sqlProvider);
     }
 

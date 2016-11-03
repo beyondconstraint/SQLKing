@@ -14,7 +14,7 @@ public class TableNamesMustBeUniqueValidator implements Validator {
         mData = data;
     }
 
-    private Table findDuplicateTable(List<Table> tables) {
+    private Table findDuplicateTable(List<Table> tables)  {
         for (Table table : tables) {
             Table duplicateTable = getDuplicateTable(table, tables);
             if (duplicateTable != null) {
@@ -25,7 +25,7 @@ public class TableNamesMustBeUniqueValidator implements Validator {
         return null;
     }
 
-    private Table getDuplicateTable(Table check, List<Table> tables) {
+    private Table getDuplicateTable(Table check, List<Table> tables)  {
         int occurrences = 0;
 
         for (Table table : tables) {
